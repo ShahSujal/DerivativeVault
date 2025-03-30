@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { headers } from "next/headers";
 import WagmiContextProvider from "@/lib/providers/wagmi-provider";
+import { ThemeProvider } from "@/lib/providers/nexttheme-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,12 +29,19 @@ export default async function RootLayout({
   const cookies = headersObj.get('cookie')
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <WagmiContextProvider cookies={cookies}>  
-        {children}
+          <ThemeProvider
+               attribute="class"
+               defaultTheme="dark"
+               enableSystem={false}
+               disableTransitionOnChange
+             >
+               {children}
+             </ThemeProvider>
         </WagmiContextProvider>
       </body>
     </html>
