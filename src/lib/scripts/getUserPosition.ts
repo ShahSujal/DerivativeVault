@@ -1,17 +1,15 @@
 import { getAccount, readContract } from "@wagmi/core";
-import { formatUnits } from "viem";
+import { Address, formatUnits } from "viem";
 import { config } from "../providers/wagmi.config";
 import { env } from "../../../env";
 import { derivativeVaultContractAbi } from "../constants/abi/derivativeVaultContractAbi";
 import { uniswapV3PositionManagerAbi } from "../constants/abi/uniswapV3PositionManagerAbi";
 import { TPosition } from "@/types/type";
-
-
-
+import { uniswapV3Abi } from "../constants/abi/uniswapv3abi";
 
 // Helper function to fetch token IDs from TheGraph
 async function fetchTokenIdsFromGraph(
-  walletAddress: string,
+  walletAddress: string
 ): Promise<bigint[]> {
   try {
     // This is a placeholder for TheGraph API call
@@ -43,101 +41,72 @@ async function fetchTokenIdsFromGraph(
   }
 }
 
-export const getUserPositions = async () => {
-  const { address } = await getAccount(config);
-
-  if (!address) {
-    return {
-      status: "Reverted",
-    };
-  }
-
-//   const liquidityManagerAddress = await readContract(config, {
-//     address: env.NEXT_PUBLIC_DERIVATIVEVAULT_CONTRACT_ADDRESS,
-//     abi: derivativeVaultContractAbi,
-//     functionName: "liquidityManager",
-//   });
-
-  const userDerivativeToken = await readContract(config, {
-    address: env.NEXT_PUBLIC_DERIVATIVEVAULT_CONTRACT_ADDRESS,
-    abi: derivativeVaultContractAbi,
-    functionName: "getUserDerivativeToken",
-    args: [address],
+const getUserPositionByIndex = async (address: Address, index: number) => {
+  const tokenId = await readContract(config, {
+    address: env.NEXT_PUBLIC_UNISWAPV3_FACTORY_CONTRACT_ADDRESS,
+    abi: uniswapV3Abi,
+    functionName: "tokenOfOwnerByIndex",
+    args: [address, BigInt(index)],
   });
 
-  // Get derivative records
-  const derivativeRecords = await readContract(config, {
-    address: env.NEXT_PUBLIC_DERIVATIVEVAULT_CONTRACT_ADDRESS,
-    abi: derivativeVaultContractAbi,
-    functionName: "derivativeRecords",
-    args: [userDerivativeToken],
+  const position = await readContract(config, {
+    address: env.NEXT_PUBLIC_UNISWAPV3_FACTORY_CONTRACT_ADDRESS,
+    abi: uniswapV3Abi,
+    functionName: "positions",
+    args: [tokenId],
   });
+  const positionData = {
+    nonce: position[0],
+    operator: position[1],
+    token0: position[2],
+    token1: position[3],
+    fee: position[4],
+    tickLower: position[5],
+    tickUpper: position[6],
+    liquidity: position[7],
+    feeGrowthInside0LastX128: position[8],
+    feeGrowthInside1LastX128: position[9],
+    tokensOwed0: position[10],
+    tokensOwed1: position[11],
+  };
+  return positionData;
+};
 
-  const idsToCheck = await fetchTokenIdsFromGraph(
-    address,
-  );
+export const getUserPositions = async (address: Address) => {
+  try {
+    const TotalPositions = await readContract(config, {
+      address: env.NEXT_PUBLIC_UNISWAPV3_FACTORY_CONTRACT_ADDRESS,
+      chainId: 11155111,
+      abi: uniswapV3Abi,
+      functionName: "balanceOf",
+      args: [address],
+    });
 
-  const userPositions: TPosition[] = [];
+    const totalPositions = Number(TotalPositions);
 
-  for (const tokenId of idsToCheck) {
-    try {
-      const positionData = await readContract(config, {
-        address:
-          env.NEXT_PUBLIC_MOCKUNISWAPV3POSITIONMANAGER_CONTRACT_ADDRESS as `0x${string}`,
-        abi: uniswapV3PositionManagerAbi,
-        functionName: "positions",
-        args: [tokenId],
-      });
+    console.log(totalPositions);
 
-      const [
-        nonce,
-        operator,
-        token0,
-        token1,
-        fee,
-        tickLower,
-        tickUpper,
-        liquidity,
-        feeGrowthInside0LastX128,
-        feeGrowthInside1LastX128,
-        tokensOwed0,
-        tokensOwed1,
-      ] = positionData as unknown as [
-        bigint,
-        string,
-        string,
-        string,
-        number,
-        number,
-        number,
-        bigint,
-        bigint,
-        bigint,
-        bigint,
-        bigint
-      ];
-
-      // Check if the position belongs to the user
-      if (operator.toLowerCase() === address.toLowerCase()) {
-        const position: TPosition = {
-          tokenId,
-          token0,
-          token1,
-          fee,
-          tickLower,
-          tickUpper,
-          liquidity,
-          tokensOwed0: formatUnits(tokensOwed0, 18),
-          tokensOwed1: formatUnits(tokensOwed1, 18),
-        };
-
-        userPositions.push(position);
-      }
-
-      return userPositions;
-    } catch (err) {
-      console.log(`Token ID ${tokenId} not found or does not belong to user`);
-      // Continue to the next token ID
+    if (totalPositions > 0) {
+      const positions = await Promise.all(
+        Array.from({ length: totalPositions }, (_, i) =>
+          getUserPositionByIndex(address, i)
+        )
+      );
+      return {
+        totalPositions: totalPositions,
+        positions: positions,
+      };
+    } else {
+      return {
+        totalPositions: 0,
+        positions: [] as TPosition[],
+      };
     }
+  } catch (error) {
+    console.log(error);
+    return {
+      totalPositions: 0,
+      positions: [] as TPosition[],
+    };
   }
 };

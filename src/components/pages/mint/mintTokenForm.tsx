@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { GlowingEffect } from "../common/glowing-effect";
 
 // import { GlowEffect } from "./gloweffect"
 interface Position {
@@ -86,7 +87,16 @@ const MintTokenForm: React.FC<OptionsMinterProps> = ({
   );
 
   return (
-    <Card className="w-full z-30 max-w-[550px] bg-[#11111660] border-[#2a2a36] backdrop-blur-lg rounded-3xl overflow-hidden">
+    <Card className="w-full z-30 max-w-[550px] bg-[#11111660] border-[#2a2a36] backdrop-blur-lg rounded-3xl ">
+         <GlowingEffect
+        blur={0}
+        borderWidth={3}
+        spread={80}
+        glow={true}
+        disabled={false}
+        proximity={64}
+        inactiveZone={0.01}
+      />
       <CardContent className="">
         <h1 className="text-3xl font-medium text-gray-600 mb-4">Mint Options</h1>
 
