@@ -1,4 +1,4 @@
-import { getAccount, readContract } from "@wagmi/core";
+import { getAccount, getBalance, readContract } from "@wagmi/core";
 import { Address, formatUnits } from "viem";
 import { config } from "../providers/wagmi.config";
 import { env } from "../../../env";
@@ -55,11 +55,27 @@ const getUserPositionByIndex = async (address: Address, index: number) => {
     functionName: "positions",
     args: [tokenId],
   });
+
+    const {symbol:token0Symbol} = await getBalance(config,{
+        address: address as Address,
+        chainId: 11155111,
+        token: position[2] as Address,
+    })
+    const {symbol:token1Symbol} = await getBalance(config,{
+        address: address as Address,
+        chainId: 11155111,
+        token: position[3] as Address,
+    })
+    
+
   const positionData = {
+    positionId: Number(tokenId),
     nonce: position[0],
     operator: position[1],
     token0: position[2],
+    token0Symbol: token0Symbol,
     token1: position[3],
+    token1Symbol: token1Symbol,
     fee: position[4],
     tickLower: position[5],
     tickUpper: position[6],

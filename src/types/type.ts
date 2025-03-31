@@ -9,10 +9,13 @@ export type TOptionDetails = {
 };
 
 export type TPosition = {
+  positionId: number;
   nonce: bigint;
   operator: `0x${string}`;
   token0: `0x${string}`;
+  token0Symbol: string;
   token1: `0x${string}`;
+  token1Symbol: string;
   fee: number;
   tickLower: number;
   tickUpper: number;
@@ -21,27 +24,9 @@ export type TPosition = {
   feeGrowthInside1LastX128: bigint;
   tokensOwed0: bigint;
   tokensOwed1: bigint;
+}
 
-//   nonce   uint96 :  0
-// operator   address :  0x0000000000000000000000000000000000000000
-// token0   address :  0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0
-// token1   address :  0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14
-// fee   uint24 :  10000
-// tickLower   int24 :  -887200
-// tickUpper   int24 :  887200
-// liquidity   uint128 :  29933427641
-// feeGrowthInside0LastX128   uint256 :  7102819458208913550344462361960394408
-// feeGrowthInside1LastX128   uint256 :  1825507333493655880775965138114502414238213
-// tokensOwed0   uint128 :  0
-// tokensOwed1   uint128 :  0
-
-
-};
-
-
-
-// : readonly [`0x${string}`, `0x${string}`, bigint, bigint, boolean, boolean, bigint]
-
+// getPool("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", 3000)
 export type TDerivativeInfo = {
   derivativeToken: string;
   collateralAsset: string;

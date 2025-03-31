@@ -1,7 +1,7 @@
 // File: src/components/OptionsExerciser.js
 import { Button } from '@/components/ui/button';
 import React from 'react';
-import OptionsTable from './PositionTable';
+import OptionsTable from '../mint-page/PositionTable';
 
 interface OptionsExerciserProps {
   options: Array<{

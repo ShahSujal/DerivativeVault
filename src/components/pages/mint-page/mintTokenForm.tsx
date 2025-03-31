@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowUpDown, ChevronDown } from "lucide-react";
@@ -17,35 +17,22 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { GlowingEffect } from "../common/glowing-effect";
+import { createMintOptions } from "@/lib/scripts/mintOptions";
+import { TPosition } from "@/types/type";
+import { walletAddressShortn } from "@/lib/actions";
+import { parseUnits } from "viem";
+import { getSevenDaysPoolPrice } from "@/lib/scripts/getSevenDaysPoolPrice";
 
 // import { GlowEffect } from "./gloweffect"
-interface Position {
-  tokenId: string;
-  token0: { symbol: string };
-  token1: { symbol: string };
-}
 
 interface OptionsMinterProps {
-  positions: Position[];
-  mintOptions: (
-    positionId: string,
-    optionType: "CALL" | "PUT",
-    strike: number,
-    expiry: number,
-    assetIndex: number
-  ) => Promise<void>;
-  isLoading: boolean;
+  positions: TPosition[];
 }
-const MintTokenForm: React.FC<OptionsMinterProps> = ({
-  positions,
-  mintOptions,
-  isLoading,
-}) => {
-  const [amount, setAmount] = useState("1.409928");
+const MintTokenForm: React.FC<OptionsMinterProps> = ({ positions }) => {
   const [formData, setFormData] = useState<{
     positionId: string;
     optionType: "CALL" | "PUT";
-    assetIndex: string; // '0' for token0, '1' for token1
+    assetIndex: string;
     strike: string;
     expiry: string;
   }>({
@@ -66,29 +53,83 @@ const MintTokenForm: React.FC<OptionsMinterProps> = ({
     });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
+    
 
     // Convert expiry to timestamp if needed
     const expiryTimestamp = new Date(formData.expiry).getTime() / 1000;
+    console.log({
+      posIndex:Number(formData.positionId)
+    });
+    
+    const pos = positions.find((item) => item.positionId == Number(formData.positionId));
+    const assetIndex = Number(formData.assetIndex);
 
-    mintOptions(
-      formData.positionId,
-      formData.optionType,
-      parseFloat(formData.strike),
-      expiryTimestamp,
-      parseInt(formData.assetIndex)
-    );
+    if (!pos) {
+      return
+    }
+
+    console.log({
+      pos
+    });
+    
+
+    const collateralAsset = assetIndex == 0 ? pos.token0 : pos.token1; // USDC address
+    const exercisePrice = parseUnits(formData.strike, 6); // $3500 (6 decimals)
+    const expiryTime = Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60; // 7 days from now
+    const isBuyOption = formData.optionType == "CALL" ? true : false; // Call option
+    const issueAmount = parseUnits("10", 6); // 100 option tokens
+
+ 
+    console.log({
+      collateralAsset,
+      exercisePrice,
+      expiryTimeInHours: expiryTime,
+      isBuyOption,
+      issueAmount,
+    });
+
+    const poolPrice = getSevenDaysPoolPrice({
+      tokenA:pos.token0,
+      tokenB:pos.token1,
+      feeTier: pos.fee
+    })
+
+    console.log(poolPrice);
+    
+    
+
+    // const response = await createMintOptions({
+    //   collateralAsset,
+    //   exercisePrice,
+    //   expiryTimeInHours: expiryTime,
+    //   isBuyOption,
+    //   issueAmount,
+    // });
+
+    // console.log(response);
+    
+
+
   };
 
   // Find selected position
-  const selectedPosition = positions.find(
-    (p) => p.tokenId === formData.positionId
-  );
+  // const selectedPosition = positions.find(
+  //   (p) => p.positionId.toString() === formData.positionId
+  // );
+
+  const [selectedPosition, setSelectedPosition] = useState<TPosition>();
+
+  useEffect(() => {
+    const selectedPosition = positions.find(
+      (p) => p.positionId.toString() === formData.positionId
+    );
+    setSelectedPosition(selectedPosition);
+  }, [formData.positionId]);
 
   return (
     <Card className="w-full z-30 max-w-[550px] bg-[#11111660] border-[#2a2a36] backdrop-blur-lg rounded-3xl ">
-         <GlowingEffect
+      <GlowingEffect
         blur={0}
         borderWidth={3}
         spread={80}
@@ -98,7 +139,9 @@ const MintTokenForm: React.FC<OptionsMinterProps> = ({
         inactiveZone={0.01}
       />
       <CardContent className="">
-        <h1 className="text-3xl font-medium text-gray-600 mb-4">Mint Options</h1>
+        <h1 className="text-3xl font-medium text-gray-600 mb-4">
+          Mint Options
+        </h1>
 
         {/* Main Transfer Card */}
         <Card className="bg-[#1a1a2378] border-[#2a2a36] backdrop-blur-sm rounded-2xl mb-2">
@@ -109,7 +152,7 @@ const MintTokenForm: React.FC<OptionsMinterProps> = ({
                 <span className="text-gray-400">Position</span>
                 <span className="text-gray-400">
                   {positions.length}{" "}
-                  <span className="text-gray-500">Total Position</span>
+                  <span className="text-gray-500">Total Position </span>
                 </span>
               </div>
 
@@ -124,16 +167,21 @@ const MintTokenForm: React.FC<OptionsMinterProps> = ({
                   }
                 >
                   <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select position" />
+                    <SelectValue placeholder="Select position " />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className=" relative">
                     {positions.map((position) => (
                       <SelectItem
-                        key={position.tokenId}
-                        value={position.tokenId}
+                        className=" relative flex flex-row "
+                        key={position.positionId}
+                        value={position.positionId.toString()}
                       >
-                        #{position.tokenId} - {position.token0.symbol}/
-                        {position.token1.symbol}
+                        <div className="flex flex-row justify-between items-center">
+                          <div className="w-3 h-3  rounded-full bg-gradient-to-tr from-blue-500 via-pink-400 to-purple-500 mr-2" />
+                          <h1>
+                            {position.token0Symbol}/{position.token1Symbol}
+                          </h1>
+                        </div>
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -190,65 +238,66 @@ const MintTokenForm: React.FC<OptionsMinterProps> = ({
             </div>
 
             {/* To Section */}
-            {selectedPosition?.token0.symbol && selectedPosition?.token1.symbol &&
-              <div className="mt-6">
-              <div className="flex justify-between mb-2">
-                <span className="text-gray-400">Select Asset</span>
-              </div>
+            {selectedPosition?.token0Symbol &&
+              selectedPosition?.token1Symbol && (
+                <div className="mt-6">
+                  <div className="flex justify-between mb-2">
+                    <span className="text-gray-400">Select Asset</span>
+                  </div>
 
-              <div className="flex justify-between items-center">
-                <div>
-                  <RadioGroup
-                    value={formData.assetIndex} // Bind the value to formData.assetIndex
-                    onValueChange={(value) =>
-                      setFormData({
-                        ...formData,
-                        assetIndex: value,
-                      })
-                    }
-                    className=" flex flex-row"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem
-                        value="0"
-                        id="option-one"
-                        className="focus:ring-blue-500 h-4 w-4 text-blue-600 bg-[#1a1a23] border-[#2a2a36]"
-                      />
-                      <Label htmlFor="option-one" className="text-white">
-                        {selectedPosition?.token0.symbol}
-                      </Label>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <RadioGroup
+                        value={formData.assetIndex} // Bind the value to formData.assetIndex
+                        onValueChange={(value) =>
+                          setFormData({
+                            ...formData,
+                            assetIndex: value,
+                          })
+                        }
+                        className=" flex flex-row"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem
+                            value="0"
+                            id="option-one"
+                            className="focus:ring-blue-500 h-4 w-4 text-blue-600 bg-[#1a1a23] border-[#2a2a36]"
+                          />
+                          <Label htmlFor="option-one" className="text-white">
+                            {selectedPosition?.token0Symbol}
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem
+                            value="1"
+                            id="option-two"
+                            className="focus:ring-blue-500 h-4 w-4 text-blue-600 bg-[#1a1a23] border-[#2a2a36]"
+                          />
+                          <Label htmlFor="option-two" className="text-white">
+                            {selectedPosition?.token1Symbol}
+                          </Label>
+                        </div>
+                      </RadioGroup>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem
-                        value="1"
-                        id="option-two"
-                        className="focus:ring-blue-500 h-4 w-4 text-blue-600 bg-[#1a1a23] border-[#2a2a36]"
-                      />
-                      <Label htmlFor="option-two" className="text-white">
-                        {selectedPosition?.token1.symbol}
-                      </Label>
-                    </div>
-                  </RadioGroup>
+                  </div>
                 </div>
-              </div>
-            </div>
-            }
+              )}
           </CardContent>
         </Card>
 
         {/* Send Button */}
         <div className="relative w-full mb-4 group">
-        
           {/* <Button
             className="relative w-full bg-[#3b3b4f] hover:bg-[#4a4a5f] text-white rounded-xl h-14 text-lg font-medium z-10"
             
           ></Button> */}
-          <button className="relative w-full inline-flex h-14 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50 mt-5"
-          onClick={() => console.log("Send transaction")}
+          <button
+            className="relative w-full inline-flex h-14 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50 mt-5"
+            onClick={() => handleSubmit()}
           >
             <span className="absolute inset-[-1000%] animate-[spin_8s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#0000000d_50%,#ffffff_100%)]" />
             <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-[#1a1a23] px-3 py-1 text-sm font-medium text-white backdrop-blur-3xl">
-             Send Transaction
+              Send Transaction
             </span>
           </button>
         </div>

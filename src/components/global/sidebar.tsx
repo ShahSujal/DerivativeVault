@@ -20,10 +20,12 @@ import Link from "next/link";
 import { useAccount } from "wagmi";
 import { Button } from "../ui/button";
 import { usePathname } from "next/navigation";
+import { useAppKit } from "@reown/appkit/react";
 
 export default function Sidebar() {
-  const { address } = useAccount();
+  const { address, chain } = useAccount();
   const pathname = usePathname();
+  const {open} = useAppKit()
   // Navigation items array
   const navItems = [
     {
@@ -68,12 +70,26 @@ export default function Sidebar() {
 
       <div className="mt-auto">
         <div className="rounded-md bg-gray-900 p-3">
-          <div className="flex items-center relative justify-between">
-            <div className=" absolute left-9 w-32 h-5 bg-gradient-to-tr from-[#5039ff] blur-lg to-[#207ff4]"></div>
+          <div className="flex items-center relative  flex-col justify-between">
+            <div className=" absolute left-1/4 top-1/4 w-32 h-5 bg-gradient-to-tr from-[#5039ff] blur-lg to-[#207ff4]"></div>
 
-            <Button
+      
+            {
+              chain?.name && (
+                <Button
               className="text-sm  border border-white/30    backdrop-blur-xl   transition duration-1000 hover:bg-white/70 hover:text-black  font-medium w-full bg-gradient-to-tr from-[#ffffff09] to-[#ffffff16] z-10"
               variant={"default"}
+              onClick={()=>open({view:"Networks"})}
+            >
+            {chain?.name}
+            </Button>
+              )
+            }
+
+            <Button
+              className="text-sm  border border-white/30    backdrop-blur-xl   transition duration-1000 hover:bg-white/70 hover:text-black  font-medium w-full bg-gradient-to-tr from-[#ffffff09] to-[#ffffff16] z-10 my-4"
+              variant={"default"}
+              onClick={()=>open()}
             >
               {address
                 ? address?.slice(0, 5) + "..." + address?.slice(-5)

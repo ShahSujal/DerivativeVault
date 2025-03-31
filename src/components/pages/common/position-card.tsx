@@ -4,7 +4,7 @@ import { GlowingEffect } from './glowing-effect'
 import { cn } from '@/lib/utils'
 import { useAccount, useBalance } from 'wagmi'
 import { config } from '@/lib/providers/wagmi.config'
-import { Address } from 'viem'
+import { Address, formatUnits, parseUnits } from 'viem'
 import { getBalance } from '@wagmi/core'
 import { walletAddressShortn } from '@/lib/actions'
 import { CopyIcon } from 'lucide-react'
@@ -67,11 +67,15 @@ const PositionCard = ({position}: Props) => {
       </div>
      </div>
    <div>
+ 
    <div className=" px-3 h-7 rounded-full justify-center items-center flex  bg-blue-950/50 border border-gray-50/20">
-      {Number(position.fee).toFixed(2)}% fee
+      { position.fee / 1e4}% Fee Tier
     </div>
    
    </div>
+
+
+
     </div>
     <h3 className="mb-2 text-xl font-medium  cursor-pointer text-gray-200">
       Total Liquidity {Number(position.liquidity).toFixed(2)}
@@ -84,6 +88,9 @@ const PositionCard = ({position}: Props) => {
         {token2Symbol}:  {walletAddressShortn(position.token1 , 8, 6)} <CopyIcon className='w-4 h-4 ml-3' />
     </p>
    </div>
+   <div className='flex flex-row justify-end items-center'>
+        <h1><span className='text-gray-400'>Tick Range:</span> {position.tickLower} to {position.tickUpper}</h1>
+    </div>
   </div>
   )
 }

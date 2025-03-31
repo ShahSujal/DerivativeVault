@@ -7,34 +7,53 @@ import {
   waitForTransactionReceipt,
   writeContract,
 } from "@wagmi/core";
-import { Address, parseUnits } from "viem";
+import { Address, erc20Abi, parseUnits } from "viem";
 import { EReciptStatus } from "@/types/enum";
 
-export async function mintOptions(
+export async function createMintOptions(
+{
+  collateralAsset,
+  exercisePrice,
+  expiryTimeInHours,
+  isBuyOption,
+  issueAmount
+}:{
   collateralAsset: Address,
-  exercisePrice: string,
+  exercisePrice: bigint,
   expiryTimeInHours: number,
   isBuyOption: boolean,
-  issueAmount: string
+  issueAmount: bigint
+}
 ): Promise<{
   status: EReciptStatus;
   message: string;
   explorerHash?: string;
 }> {
   try {
-    const expiryTime =
-      Math.floor(Date.now() / 1000) + expiryTimeInHours * 60 * 60;
+    const expiryTime = Math.floor(Date.now() / 1000) + expiryTimeInHours * 60 * 60;
 
+    // const usdcContract = new ethers.Contract(USDC_CONTRACT, ERC20_ABI, wallet);
+
+
+    const approveHash = await writeContract(config, {
+      address: collateralAsset,
+      abi: erc20Abi,
+      functionName: "approve",
+      args: [
+         env.NEXT_PUBLIC_DERIVATIVEVAULT_CONTRACT_ADDRESS,
+         BigInt(issueAmount)
+      ],
+    });
     const { request } = await simulateContract(config, {
       address: env.NEXT_PUBLIC_DERIVATIVEVAULT_CONTRACT_ADDRESS,
       abi: derivativeVaultContractAbi,
       functionName: "generateOptions",
       args: [
         collateralAsset,
-        parseUnits(exercisePrice, 18), // Adjust decimals based on asset
+        exercisePrice, // Adjust decimals based on asset
         BigInt(expiryTime),
         isBuyOption,
-        parseUnits(issueAmount, 18), // Adjust decimals based on asset
+        issueAmount, // Adjust decimals based on asset
       ],
     });
 

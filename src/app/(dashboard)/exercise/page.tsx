@@ -1,5 +1,5 @@
 "use client";
-import OptionsExerciser from "@/components/pages/mint/PositionExcersier";
+// import OptionsExerciser from "@/components/pages/mint-page/PositionExcersier";
 import React, { useEffect, useState } from "react";
 
 type TokenInfo = {
@@ -241,7 +241,7 @@ const fetchUserPositions = async () => {
   return (
     <div className=" rounded-lg bg-[#0b0f18] min-h-screen shadow p-6">
       <h2 className="text-2xl font-bold mb-4">Exercise Options</h2>
-      <OptionsExerciser options={userOptions} exerciseOptions={exerciseOptions} isLoading={false} />
+      {/* <OptionsExerciser options={userOptions} exerciseOptions={exerciseOptions} isLoading={false} /> */}
     </div>
   );
 };
