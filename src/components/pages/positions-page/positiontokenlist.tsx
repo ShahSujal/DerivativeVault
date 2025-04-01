@@ -11,12 +11,15 @@ import {
 } from "@/components/ui/carousel";
 
 import PositionTokenCard from "../common/positiontoken-card";
+import { TPosition } from "@/types/type";
+type Props = {
+  positions: TPosition[];
+  selectedPosition: TPosition | undefined; // Can be a number or undefined
+  setSelectedPosition: React.Dispatch<React.SetStateAction<TPosition | undefined>>;
+};
 
-type Props = {};
+const PositionTokenList = ({positions, selectedPosition, setSelectedPosition}: Props) => {
 
-const PositionTokenList = (props: Props) => {
-  const { address } = useAccount();
-  const { data: positions } = useGetUserPositions(address);
   return (
     <div className=" w-full px-10  flex flex-col ">
       <div>
@@ -31,13 +34,13 @@ const PositionTokenList = (props: Props) => {
         className="w-full px-4"
       >
         <CarouselContent className="-ml-4">
-          {positions?.positions.map((position) => (
+          {positions?.map((position) => (
             <CarouselItem
               key={position.positionId}
               className="pl-4 md:basis-1/3 lg:basis-1/3"
               style={{ flex: '0 0 auto' }}
             >
-              <PositionTokenCard position={position} />
+              <PositionTokenCard position={position} selectedPosition={selectedPosition} setSelectedPosition={setSelectedPosition}  />
             </CarouselItem>
           ))}
         </CarouselContent>

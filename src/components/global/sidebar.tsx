@@ -49,9 +49,9 @@ export default function Sidebar() {
   return (
     <aside className="hidden md:flex w-64 flex-col border-r border-gray-800 bg-gray-950 p-4">
       <div className="flex items-center gap-2 px-2 py-3">
-        <div className="flex h-6 w-6 items-center justify-center rounded bg-white text-black">
-          <Layers className="h-3 w-3" />
-        </div>
+        {/* <div className="flex h-6 w-6 items-center justify-center rounded bg-white text-black">
+      
+        </div> */}
         <span className="font-semibold">Derivative Vault</span>
       </div>
 

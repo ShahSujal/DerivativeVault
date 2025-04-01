@@ -29,7 +29,7 @@ const SLOT0_ABI = [
   },
 ] as const;
 
-function sqrtPriceX96ToPrice(
+export function sqrtPriceX96ToPrice(
   sqrtPriceX96: bigint,
   decimals0 = 18,
   decimals1 = 18 

@@ -4,7 +4,11 @@ import { isAddress } from "viem";
 import { z } from "zod";
 
 export const env = createEnv({
-  server: {},
+  server: {
+    GRAPH_API_KEY: z.string(),
+    GRAPH_URL:z.string()
+
+  },
   client: {
       NEXT_PUBLIC_PROJECT_ID: z.string().min(6),
       NEXT_PUBLIC_MOCKRATEORACLE_CONTRACT_ADDRESS: z
@@ -32,6 +36,7 @@ export const env = createEnv({
         NEXT_PUBLIC_UNISWAPV3_FACTORY_CONTRACT_ADDRESS: z.string().refine((v) => isAddress(v), {
           message: "Invalid address,NEXT_PUBLIC_UNISWAPV3_FACTORY_CONTRACT_ADDRESS",
         }),
+       
     },
 
   runtimeEnv: {
@@ -41,6 +46,8 @@ export const env = createEnv({
       NEXT_PUBLIC_MOCKUNISWAPV3POSITIONMANAGER_CONTRACT_ADDRESS: process.env.NEXT_PUBLIC_MOCKUNISWAPV3POSITIONMANAGER_CONTRACT_ADDRESS,
       NEXT_PUBLIC_DERIVATIVEVAULT_CONTRACT_ADDRESS: process.env.NEXT_PUBLIC_DERIVATIVEVAULT_CONTRACT_ADDRESS,
       NEXT_PUBLIC_SEPOLIA_RPC: process.env.NEXT_PUBLIC_SEPOLIA_RPC,
-      NEXT_PUBLIC_UNISWAPV3_FACTORY_CONTRACT_ADDRESS: process.env.NEXT_PUBLIC_UNISWAPV3_FACTORY_CONTRACT_ADDRESS
+      NEXT_PUBLIC_UNISWAPV3_FACTORY_CONTRACT_ADDRESS: process.env.NEXT_PUBLIC_UNISWAPV3_FACTORY_CONTRACT_ADDRESS,
+      GRAPH_API_KEY: process.env.GRAPH_API_KEY,
+      GRAPH_URL: process.env.GRAPH_URL
   },
 });

@@ -36,3 +36,34 @@ export type TDerivativeInfo = {
   exercised: boolean;
   collateralAmount: string;
 };
+
+
+export type TRealTimePriceData = {
+  data: Data;
+}
+
+export type Data = {
+  pools: Pool[];
+}
+
+export type Pool = {
+  createdAtTimestamp:           string;
+  id:                           string;
+  sqrtPrice:                    string;
+  swaps:                        Swap[];
+  token0Price:                  string;
+  token1Price:                  string;
+  totalValueLockedETH:          string;
+  totalValueLockedUSDUntracked: string;
+}
+
+export type Swap = {
+  amountUSD:    string;
+  id:           string;
+  recipient:    string;
+  sender:       string;
+  sqrtPriceX96: string;
+  tick:         string;
+  timestamp:    string;
+}
+

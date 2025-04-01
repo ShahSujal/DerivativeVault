@@ -32,3 +32,38 @@ export const  getRandomGradient = ()=> {
   // Return the CSS gradient string
   return `linear-gradient(135deg, ${color1}, ${color2})`;
 }
+
+
+
+export function formatCurrency(value: number): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value)
+}
+
+export function formatTimestamp(timestamp: number, includeTime = false): string {
+  const date = new Date(timestamp)
+
+  if (includeTime) {
+    return date.toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+  }
+
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  })
+}
+
+export function truncateAddress(address: string): string {
+  if (!address) return ""
+  return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`
+}
+

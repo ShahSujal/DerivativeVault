@@ -22,6 +22,7 @@ import { TPosition } from "@/types/type";
 import { walletAddressShortn } from "@/lib/actions";
 import { parseUnits } from "viem";
 import { getSevenDaysPoolPrice } from "@/lib/scripts/getSevenDaysPoolPrice";
+import { getPoolPriceByTokenAddress } from "@/lib/scripts/getTokenPriceByTokenAddress";
 
 // import { GlowEffect } from "./gloweffect"
 
@@ -89,13 +90,20 @@ const MintTokenForm: React.FC<OptionsMinterProps> = ({ positions }) => {
       issueAmount,
     });
 
-    const poolPrice = getSevenDaysPoolPrice({
+    const poolPrice = await getSevenDaysPoolPrice({
       tokenA:pos.token0,
       tokenB:pos.token1,
       feeTier: pos.fee
     })
-
     console.log(poolPrice);
+    
+    // const poolPrice = await getPoolPriceByTokenAddress({
+    //   tokenA:pos.token0,
+    //   tokenB:pos.token1,
+    //   feeTier: pos.fee
+    // })
+
+    // console.log(poolPrice);
     
     
 

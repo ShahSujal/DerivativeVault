@@ -113,6 +113,7 @@ export const getSevenDaysPoolPrice = async ({
         tokenB: tokenB
     })
 
+    return poolAddress
     // const contract = new ethers.Contract(
     //   poolAddress,
     //   UNISWAP_SWAP_TRANSACTION_ABI,
