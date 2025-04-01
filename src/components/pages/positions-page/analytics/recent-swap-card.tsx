@@ -1,24 +1,24 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
-import { formatCurrency, formatTimestamp, truncateAddress } from "@/lib/utils"
-import { ArrowUpRight, ArrowDownUp } from "lucide-react"
-import { Pool } from "@/types/type"
-import { sqrtPriceX96ToPrice } from "@/lib/scripts/getTokenPriceByTokenAddress"
+import { formatTimestamp, truncateAddress } from "@/lib/utils";
+import { ArrowDownUp } from "lucide-react";
+import { Pool } from "@/types/type";
+import { sqrtPriceX96ToPrice } from "@/lib/scripts/getTokenPriceByTokenAddress";
 
 interface RecentSwapsCardProps {
-  pool: Pool
+  pool: Pool;
 }
 
 export function RecentSwapsCard({ pool }: RecentSwapsCardProps) {
-  const [hoveredSwap, setHoveredSwap] = useState<string | null>(null)
+  const [hoveredSwap, setHoveredSwap] = useState<string | null>(null);
 
   // Sort swaps by timestamp (newest first)
   const recentSwaps = [...pool.swaps]
     .sort((a, b) => Number.parseInt(b.timestamp) - Number.parseInt(a.timestamp))
-    .slice(0, 5)
+    .slice(0, 5);
 
   return (
     <motion.div
@@ -53,46 +53,37 @@ export function RecentSwapsCard({ pool }: RecentSwapsCardProps) {
                   <div>
                     <div className="flex items-center space-x-2">
                       <ArrowDownUp className="h-4 w-4 text-blue-400" />
-                      <span className="font-medium">${sqrtPriceX96ToPrice(BigInt(swap.sqrtPriceX96))} </span>
+                      <span className="font-medium">
+                        ${sqrtPriceX96ToPrice(BigInt(swap.sqrtPriceX96))}{" "}
+                      </span>
                     </div>
                     <div className="mt-1 text-sm text-gray-400">
-                      {formatTimestamp(Number.parseInt(swap.timestamp) * 1000, true)}
+                      {formatTimestamp(
+                        Number.parseInt(swap.timestamp) * 1000,
+                        true
+                      )}
                     </div>
                   </div>
                   <div className="text-right">
                     <div className="text-sm">
-                      From: <span className="text-blue-400">{truncateAddress(swap.sender)}</span>
+                      From:{" "}
+                      <span className="text-blue-400">
+                        {truncateAddress(swap.sender)}
+                      </span>
                     </div>
                     <div className="text-sm">
-                      To: <span className="text-purple-400">{truncateAddress(swap.recipient)}</span>
+                      To:{" "}
+                      <span className="text-purple-400">
+                        {truncateAddress(swap.recipient)}
+                      </span>
                     </div>
                   </div>
                 </div>
-
-                {/* {hoveredSwap === swap.id && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="mt-3 pt-3 border-t border-gray-700 text-xs text-gray-400"
-                  >
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <span className="block">Tick:</span>
-                        <span className="font-mono">{swap.tick}</span>
-                      </div>
-                      <div>
-                        <span className="block">Sqrt Price:</span>
-                        <span className="font-mono">{Number.parseFloat(swap.sqrtPriceX96).toExponential(2)}</span>
-                      </div>
-                    </div>
-                  </motion.div>
-                )} */}
               </div>
             </motion.div>
           ))}
         </AnimatePresence>
       </div>
     </motion.div>
-  )
+  );
 }
-

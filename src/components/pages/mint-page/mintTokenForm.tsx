@@ -3,9 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowUpDown, ChevronDown } from "lucide-react";
-import { motion } from "framer-motion";
-
+import { ArrowUpDown} from "lucide-react";
 import { HashLoader } from "react-spinners";
 
 import {
@@ -40,6 +38,7 @@ import {
 import { getPoolPriceByTokenAddress } from "@/lib/scripts/getTokenPriceByTokenAddress";
 import { EReciptStatus } from "@/types/enum";
 import Image from "next/image";
+import { useAccount } from "wagmi";
 
 // import { GlowEffect } from "./gloweffect"
 
@@ -60,6 +59,8 @@ const MintTokenForm: React.FC<OptionsMinterProps> = ({ positions }) => {
     strike: "",
     expiry: "",
   });
+
+  const {address} = useAccount()
 
   const [currentStep, setCurrentStep] = useState<TCurrentStatus>({
     status: EReciptStatus.LOADING,
@@ -84,13 +85,27 @@ const MintTokenForm: React.FC<OptionsMinterProps> = ({ positions }) => {
       title: "Processing Transaction",
     });
 
+       if (!address) {
+          return  setCurrentStep({
+            title: "Transaction Failed",
+            status: EReciptStatus.REVERTED,
+            description:
+              "Please Connect to your metamask Wallet",
+          });
+        }
+
     const pos = positions.find(
       (item) => item.positionId == Number(formData.positionId)
     );
     const assetIndex = Number(formData.assetIndex);
 
     if (!pos) {
-      return;
+      return  setCurrentStep({
+        title: "Transaction Failed",
+        status: EReciptStatus.REVERTED,
+        description:
+          "Something went wrong",
+      });
     }
     const collateralAsset = assetIndex == 0 ? pos.token0 : pos.token1;
     const exercisePrice = parseUnits(
@@ -342,7 +357,7 @@ const MintTokenForm: React.FC<OptionsMinterProps> = ({ positions }) => {
                       <HashLoader color="#000" size={150} />
                     ) : currentStep.status == EReciptStatus.REVERTED ? (
                       <Image
-                        src={"/icons/error.webp"}
+                        src={"/assets/error.webp"}
                         width={400}
                         height={400}
                         alt=""
@@ -350,7 +365,7 @@ const MintTokenForm: React.FC<OptionsMinterProps> = ({ positions }) => {
                       />
                     ) : (
                       <Image
-                        src={"/icons/successfully.webp"}
+                        src={"/assets/successfully.webp"}
                         width={400}
                         height={400}
                         alt=""

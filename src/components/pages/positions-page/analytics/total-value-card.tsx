@@ -44,8 +44,8 @@ export function TotalValueCard({ pools }: TotalValueCardProps) {
       </div>
 
       <div className="mt-4">
-        <span className="text-blue-400 text-sm">+15.2%</span>
-        <span className="text-gray-400 text-sm ml-1">vs last week</span>
+        {/* <span className="text-blue-400 text-sm">+15.2%</span> */}
+        {/* <span className="text-gray-400 text-sm ml-1">vs last week</span> */}
       </div>
     </motion.div>
   )

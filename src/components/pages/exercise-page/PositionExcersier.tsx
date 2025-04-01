@@ -1,7 +1,5 @@
-// File: src/components/OptionsExerciser.js
 import { Button } from "@/components/ui/button";
-import React from "react";
-// import OptionsTable from '../mint-page/PositionTable';
+import React, { useState } from "react";
 import useGetUserExercise from "@/lib/hooks/useGetUserExercise";
 import { useAccount } from "wagmi";
 import {
@@ -29,10 +27,28 @@ import {
 import { walletAddressShortn } from "@/lib/actions";
 import { Badge } from "@/components/ui/badge";
 import { exerciseOption } from "@/lib/scripts/exerciseOption";
-import { TExerciseData } from "@/types/type";
+import { TCurrentStatus, TExerciseData } from "@/types/type";
+import { EReciptStatus } from "@/types/enum";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { HashLoader } from "react-spinners";
+import Image from "next/image";
 
 const OptionsExerciser = () => {
   const { address } = useAccount();
+
+  const [currentStep, setCurrentStep] = useState<TCurrentStatus>({
+    status: EReciptStatus.LOADING,
+    description: "Please wait for a while..",
+    title: "Processing Transaction",
+  });
+
   const { data: exercise, isLoading } = useGetUserExercise(address);
 
   // Function to check if option is exercisable (within 1 hour of expiry)
@@ -111,7 +127,8 @@ const OptionsExerciser = () => {
 
   if (!exercise || exercise?.length < 1) {
     return (
-      <div className="text-center py-8">
+      <div className="text-center w-full h-[450px] flex justify-center items-center flex-col py-8">
+        <Image src={"/assets/empty.webp"} alt="" className=" w-56 h-56" />
         <p className="text-gray-500">
           No options available to exercise. Mint some options first.
         </p>
@@ -121,20 +138,39 @@ const OptionsExerciser = () => {
 
   const handleExercise = async (execrise: TExerciseData) => {
     if (!address) {
-      return
+      return setCurrentStep({
+        title: "Transaction Failed",
+        status: EReciptStatus.REVERTED,
+        description: "Please Connect to your metamask Wallet",
+      });
     }
     const submitExecrise = await exerciseOption({
       assetToken: execrise.collateralAsset,
       userAddress: address,
       amount: execrise.collateralAmount.toString(),
     });
+
+    if (submitExecrise.status == EReciptStatus.SUCCESS) {
+      setCurrentStep({
+        title: "Exercise Created SuccessFully",
+        status: EReciptStatus.SUCCESS,
+        description: "Go To position page and check your exercise rewards",
+      });
+    } else {
+      setCurrentStep({
+        title: "Transaction Failed",
+        status: EReciptStatus.REVERTED,
+        description:
+          "Something went wrong. Please retry later or contact support.",
+      });
+    }
   };
 
   return (
     <div className="overflow-x-auto">
       {/* Execrise start */}
 
-      <div className="w-full rounded-md border border-gray-800 bg-gray-950 p-4">
+      <div className="w-full rounded-md border border-gray-800 bg-[#11111660] p-4">
         <Table>
           <TableCaption>Your Active and Expired Options</TableCaption>
           <TableHeader>
@@ -226,19 +262,70 @@ const OptionsExerciser = () => {
                     )}
                   </TableCell>
                   <TableCell>
-                    <Button
-                      onClick={() => handleExercise(exerciseItem)}
-                      disabled={!isExercisable(Number(exerciseItem.expiryTime))}
-                      variant={
-                        isExercisable(Number(exerciseItem.expiryTime))
-                          ? "default"
-                          : "ghost"
-                      }
-                      className="px-3 py-1 w-24"
-                      size="sm"
-                    >
-                      Exercise
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button
+                          onClick={() => handleExercise(exerciseItem)}
+                          disabled={
+                            !isExercisable(Number(exerciseItem.expiryTime))
+                          }
+                          variant={
+                            isExercisable(Number(exerciseItem.expiryTime))
+                              ? "default"
+                              : "ghost"
+                          }
+                          className="px-3 py-1 w-24"
+                          size="sm"
+                        >
+                          Exercise
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent
+                        className={`sm:max-w-[425px] ${
+                          currentStep.status == EReciptStatus.LOADING
+                            ? "[&>button]:hidden"
+                            : ""
+                        }`}
+                        onInteractOutside={(e) => {
+                          e.preventDefault();
+                        }}
+                      >
+                        <DialogHeader>
+                          <div className=" w-full h-[450px] flex justify-center flex-col items-center">
+                            <DialogTitle></DialogTitle>
+
+                            <div className=" h-[150px] w-[150px]  mb-10 flex justify-center items-center">
+                              {currentStep.status == EReciptStatus.LOADING ? (
+                                <HashLoader color="#000" size={150} />
+                              ) : currentStep.status ==
+                                EReciptStatus.REVERTED ? (
+                                <Image
+                                  src={"/assets/error.webp"}
+                                  width={400}
+                                  height={400}
+                                  alt=""
+                                  className=" w-[150px] h-[150px] object-contain"
+                                />
+                              ) : (
+                                <Image
+                                  src={"/assets/successfully.webp"}
+                                  width={400}
+                                  height={400}
+                                  alt=""
+                                  className=" w-[150px] h-[150px] object-contain"
+                                />
+                              )}
+                            </div>
+                            <h1 className=" text-center text-xl ">
+                              {currentStep.title}
+                            </h1>
+                            <DialogDescription className="text-center">
+                              {currentStep.description}
+                            </DialogDescription>
+                          </div>
+                        </DialogHeader>
+                      </DialogContent>
+                    </Dialog>
                   </TableCell>
                 </TableRow>
               );

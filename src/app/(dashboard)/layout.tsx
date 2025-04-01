@@ -1,6 +1,5 @@
 "use client";
 import type React from "react";
-import { ThemeProvider } from "@/lib/providers/nexttheme-provider";
 import Sidebar from "@/components/global/sidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 

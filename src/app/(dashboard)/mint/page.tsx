@@ -1,56 +1,12 @@
 "use client"
-// import { AnimatedGradientBorder } from '@/components/pages/mint/animatedGradient';
+
 import MintTokenForm from '@/components/pages/mint-page/mintTokenForm';
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import {motion} from "framer-motion"
 import useGetUserPositions from '@/lib/hooks/useGetUserPositions';
 import { useAccount } from 'wagmi';
 type Props = {}
-type TokenInfo = {
-    name: string;
-    symbol: string;
-    decimals: number;
-    address?: string;
-  };
-  
-  type Position = {
-    tokenId: string;
-    token0: TokenInfo;
-    token1: TokenInfo;
-    fee: number;
-    tickLower: number;
-    tickUpper: number;
-    liquidity: string;
-  };
-  
-  type Transaction = {
-    id: string;
-    type: string;
-    positionId: string;
-    optionType: string;
-    asset: string;
-    timestamp: number;
-    user: string;
-  };
-  
-  type Option = {
-    id: number;
-    optionType: "CALL" | "PUT";
-    assetSymbol: string;
-    positionId: string;
-    strike: number;
-    expiry: number;
-    amount: number;
-    status: string;
-  };
-  
-  type Statistics = {
-    totalLockedPositions: number;
-    totalMintedOptions: number;
-    totalExercisedOptions: number;
-    totalValueLocked: string;
-  };
-  
+
 const page = (props: Props) => {
 
   const {address} = useAccount()
