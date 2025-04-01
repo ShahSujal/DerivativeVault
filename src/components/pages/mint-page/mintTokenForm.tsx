@@ -13,16 +13,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { GlowingEffect } from "../common/glowing-effect";
 import { createMintOptions } from "@/lib/scripts/mintOptions";
-import { TPosition } from "@/types/type";
+import { TCurrentStatus, TPosition } from "@/types/type";
 import { walletAddressShortn } from "@/lib/actions";
 import { parseUnits } from "viem";
-import { getPoolAddress, getSevenDaysPoolPrice } from "@/lib/scripts/getSevenDaysPoolPrice";
+import {
+  getPoolAddress,
+  getSevenDaysPoolPrice,
+} from "@/lib/scripts/getSevenDaysPoolPrice";
 import { getPoolPriceByTokenAddress } from "@/lib/scripts/getTokenPriceByTokenAddress";
+import { EReciptStatus } from "@/types/enum";
 
 // import { GlowEffect } from "./gloweffect"
 
@@ -44,6 +58,12 @@ const MintTokenForm: React.FC<OptionsMinterProps> = ({ positions }) => {
     expiry: "",
   });
 
+  const [currentStep, setCurrentStep] = useState<TCurrentStatus>({
+    status: EReciptStatus.LOADING,
+    description: "Please wait for a while..",
+    title: "Processing Transaction",
+  });
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -55,46 +75,53 @@ const MintTokenForm: React.FC<OptionsMinterProps> = ({ positions }) => {
   };
 
   const handleSubmit = async () => {
-    const expiryTimestamp = new Date(formData.expiry).getTime() / 1000;
-    console.log({
-      posIndex:Number(formData.positionId)
-    });
-    
-    const pos = positions.find((item) => item.positionId == Number(formData.positionId));
+    const pos = positions.find(
+      (item) => item.positionId == Number(formData.positionId)
+    );
     const assetIndex = Number(formData.assetIndex);
 
     if (!pos) {
-      return
+      return;
     }
-    const collateralAsset = assetIndex == 0 ? pos.token0 : pos.token1; 
-    const exercisePrice = parseUnits(formData.strike, assetIndex == 0 ? pos.token0Decimal : pos.token1Decimal); 
-    const expiryTime = Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60; 
-    const isBuyOption = formData.optionType == "CALL" ? true : false; 
-    const issueAmount = 1
-    
+    const collateralAsset = assetIndex == 0 ? pos.token0 : pos.token1;
+    const exercisePrice = parseUnits(
+      formData.strike,
+      assetIndex == 0 ? pos.token0Decimal : pos.token1Decimal
+    );
+    const expiryTime = Number(formData);
+    const isBuyOption = formData.optionType == "CALL" ? true : false;
+    const issueAmount = 1;
+
     const poolAddress = await getPoolAddress({
-      tokenA:pos.token0,
-      tokenB:pos.token1,
-      feeTier: pos.fee
-    })
-  
+      tokenA: pos.token0,
+      tokenB: pos.token1,
+      feeTier: pos.fee,
+    });
     const response = await createMintOptions({
       collateralAsset,
       exercisePrice,
       expiryTimeInHours: expiryTime,
       isBuyOption,
       issueAmount,
-      poolAddress
+      poolAddress,
     });
+
+    if (response.status == EReciptStatus.SUCCESS) {
+      setCurrentStep({
+        title: "Transaction Success",
+        status: EReciptStatus.SUCCESS,
+        description: "Transaction Completed go to exercise page",
+      });
+    } else {
+      setCurrentStep({
+        title: "Transaction Failed",
+        status: EReciptStatus.REVERTED,
+        description:
+          "Something went wrong. Please retry later or contact support.",
+      });
+    }
   };
-
-  // Find selected position
-  // const selectedPosition = positions.find(
-  //   (p) => p.positionId.toString() === formData.positionId
-  // );
-
   const [selectedPosition, setSelectedPosition] = useState<TPosition>();
-
   useEffect(() => {
     const selectedPosition = positions.find(
       (p) => p.positionId.toString() === formData.positionId
@@ -218,6 +245,7 @@ const MintTokenForm: React.FC<OptionsMinterProps> = ({ positions }) => {
                 <div className="mt-6">
                   <div className="flex justify-between mb-2">
                     <span className="text-gray-400">Select Asset</span>
+                    <span className="text-gray-400">Expiry Time(hrs)</span>
                   </div>
 
                   <div className="flex justify-between items-center">
@@ -254,6 +282,18 @@ const MintTokenForm: React.FC<OptionsMinterProps> = ({ positions }) => {
                         </div>
                       </RadioGroup>
                     </div>
+
+                    <Input
+                      type="number"
+                      placeholder="1 hr"
+                      onChange={(e) => {
+                        setFormData({
+                          ...formData,
+                          expiry: e.currentTarget.value,
+                        });
+                      }}
+                      className=" w-36"
+                    />
                   </div>
                 </div>
               )}
@@ -262,17 +302,13 @@ const MintTokenForm: React.FC<OptionsMinterProps> = ({ positions }) => {
 
         {/* Send Button */}
         <div className="relative w-full mb-4 group">
-          {/* <Button
-            className="relative w-full bg-[#3b3b4f] hover:bg-[#4a4a5f] text-white rounded-xl h-14 text-lg font-medium z-10"
-            
-          ></Button> */}
           <button
             className="relative w-full inline-flex h-14 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50 mt-5"
             onClick={() => handleSubmit()}
           >
             <span className="absolute inset-[-1000%] animate-[spin_8s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#0000000d_50%,#ffffff_100%)]" />
             <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-[#1a1a23] px-3 py-1 text-sm font-medium text-white backdrop-blur-3xl">
-              Send Transaction
+              Mint Option
             </span>
           </button>
         </div>

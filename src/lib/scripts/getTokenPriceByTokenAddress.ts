@@ -32,10 +32,10 @@ const SLOT0_ABI = [
 export function sqrtPriceX96ToPrice(
   sqrtPriceX96: bigint,
   decimals0 = 18,
-  decimals1 = 18 
+  decimals1 = 18
 ) {
   const Q96 = BigInt(2) ** BigInt(96);
-  const priceX192 = BigInt(sqrtPriceX96) * BigInt(sqrtPriceX96); 
+  const priceX192 = BigInt(sqrtPriceX96) * BigInt(sqrtPriceX96);
 
   const priceX96 = priceX192 / Q96;
   const scaleFactor = BigInt(10) ** BigInt(decimals0 - decimals1);

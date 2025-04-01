@@ -1,3 +1,5 @@
+import { EReciptStatus } from "./enum";
+
 export type TOptionDetails = {
   derivativeToken: string;
   collateralAsset: string;
@@ -79,3 +81,9 @@ export type TExerciseData= {
   collateralAmount: bigint;
   poolAddress: `0x${string}`;
 }
+
+export type TCurrentStatus = {
+  status: EReciptStatus;
+  title: string;
+  description: string;
+};

@@ -7,32 +7,31 @@ import {
   waitForTransactionReceipt,
   writeContract,
 } from "@wagmi/core";
-import { Address, erc20Abi, parseUnits } from "viem";
+import { Address } from "viem";
 import { EReciptStatus } from "@/types/enum";
 
-export async function createMintOptions(
-{
+export async function createMintOptions({
   collateralAsset,
   exercisePrice,
   expiryTimeInHours,
   isBuyOption,
   issueAmount,
-  poolAddress
-}:{
-  collateralAsset: Address,
-  exercisePrice: bigint,
-  expiryTimeInHours: number,
-  isBuyOption: boolean,
-  issueAmount: number,
-  poolAddress:Address
-}
-): Promise<{
+  poolAddress,
+}: {
+  collateralAsset: Address;
+  exercisePrice: bigint;
+  expiryTimeInHours: number;
+  isBuyOption: boolean;
+  issueAmount: number;
+  poolAddress: Address;
+}): Promise<{
   status: EReciptStatus;
   message: string;
   explorerHash?: string;
 }> {
   try {
-    const expiryTime = Math.floor(Date.now() / 1000) + expiryTimeInHours * 60 * 60;
+    const expiryTime =
+      Math.floor(Date.now() / 1000) + expiryTimeInHours * 60 * 60;
 
     const { request } = await simulateContract(config, {
       address: env.NEXT_PUBLIC_DERIVATIVEVAULT_CONTRACT_ADDRESS,
@@ -44,7 +43,7 @@ export async function createMintOptions(
         BigInt(expiryTime),
         isBuyOption,
         BigInt(issueAmount),
-        poolAddress
+        poolAddress,
       ],
     });
 
@@ -56,13 +55,13 @@ export async function createMintOptions(
     });
 
     if (receipt.status == "success") {
-      return{
+      return {
         status: EReciptStatus.SUCCESS,
         message: "Transaction failed",
-        explorerHash:hash
+        explorerHash: hash,
       };
     } else {
-      return{
+      return {
         status: EReciptStatus.REVERTED,
         message: "Transaction failed",
       };
