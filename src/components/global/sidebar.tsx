@@ -1,51 +1,19 @@
 "use client";
 import type React from "react";
-import {
-  BarChart2,
-  Clock,
-  DraftingCompass,
-  FileText,
-  Flame,
-  Layers,
-  MessageSquare,
-  Plus,
-  Search,
-  Settings,
-  Skull,
-  Users,
-  Wallet,
-  Zap,
-} from "lucide-react";
+
 import Link from "next/link";
 import { useAccount } from "wagmi";
 import { Button } from "../ui/button";
 import { usePathname } from "next/navigation";
 import { useAppKit } from "@reown/appkit/react";
+import { sideBarItems } from "@/lib/constants/sidebar-Items";
 
 export default function Sidebar() {
   const { address, chain } = useAccount();
   const pathname = usePathname();
   const { open } = useAppKit();
   // Navigation items array
-  const navItems = [
-    {
-      icon: <Zap className="h-4 w-4" />,
-      label: "Dashboard",
-      link: "/dashboard",
-    },
-    // { icon: <BarChart2 className="h-4 w-4" />, label: "Statistics", link: "/statistics" },
-    { icon: <Flame className="h-4 w-4" />, label: "Mint", link: "/mint" },
-    {
-      icon: <DraftingCompass className="h-4 w-4" />,
-      label: "Exercise",
-      link: "/exercise",
-    },
-    {
-      icon: <Skull className="h-4 w-4" />,
-      label: "Position List",
-      link: "/positionlist",
-    },
-  ];
+
   return (
     <aside className="hidden md:flex w-64 flex-col border-r border-gray-800 bg-gray-950 p-4">
       <div className="flex items-center gap-2 px-2 py-3">
@@ -57,7 +25,7 @@ export default function Sidebar() {
 
       {/* Navigation */}
       <nav className="mt-6 flex flex-col gap-1">
-        {navItems.map((item) => (
+        {sideBarItems.map((item) => (
           <NavItem
             key={item.link}
             icon={item.icon}
