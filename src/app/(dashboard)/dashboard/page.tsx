@@ -17,6 +17,8 @@ import useGetUserPositions from "@/lib/hooks/useGetUserPositions";
 import { useAccount } from "wagmi";
 import PositionCard from "@/components/pages/common/position-card";
 import { integrationTasks } from "@/lib/constants/integrateTask";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function Dashboard() {
   const greeting = getGreetingBasedOnTime();
@@ -46,10 +48,12 @@ export default function Dashboard() {
 
         <div className=" flex flex-row justify-between items-center">
           <h1 className="text-2xl ml-2 font-semibold my-8">Your Positions</h1>
-          <div className=" px-3 h-7 rounded-full justify-center items-center flex  bg-blue-950/50 border border-gray-50/20">
+         <Link href={"/positionlist"}>
+         <Button className=" px-3 h-10 rounded-full hover:bg-black justify-center items-center flex  bg-blue-950/50 border border-gray-50/20">
             View All
             <ChevronRight className=" text-gray-600" />
-          </div>
+          </Button>
+         </Link>
         </div>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2">

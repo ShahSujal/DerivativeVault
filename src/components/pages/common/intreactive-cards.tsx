@@ -39,7 +39,7 @@ const IntegrationCard= ({task}:IntegrationCardProps) => {
       <div className="mb-4 flex items-start justify-between">
         <div className="h-10 w-10 overflow-hidden rounded-md">{task.logo}</div>
         {/* chevron-right */}
-      <div className=" w-24 h-7 rounded-full justify-center items-center flex  bg-blue-950/50 border border-gray-50/20">
+      <div className=" w-52 h-7 rounded-full justify-center items-center flex  bg-blue-950/50 border border-gray-50/20">
         {task.action}
       </div>
       </div>
