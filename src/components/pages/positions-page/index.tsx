@@ -13,7 +13,7 @@ const PositionPage = (props: Props) => {
   const { data: positions } = useGetUserPositions(address);
   const [selectedPosition, setSelectedPosition] = useState<TPosition>();
   return (
-        <div
+    <div
       className="min-h-screen px-4 max-sm:px-0 w-full flex flex-col"
       style={{
         backgroundImage: "url('/assets/siworld.webp')",
@@ -29,25 +29,27 @@ const PositionPage = (props: Props) => {
             selectedPosition={selectedPosition}
           />
           {selectedPosition ? (
-            <PriceChart
-              position={selectedPosition}
-            />
+            <PriceChart position={selectedPosition} />
           ) : (
             <div className="text-2xl text-bold w-full flex flex-col justify-center backdrop-blur-sm items-center  h-[300px] font-serif">
-                    
-                <Image
-                  src={"/assets/eth.webp"}
-                  alt=""
-                  className="opacity-60 transition animate-bounce-slow mix-blend-hard-light"
-                  width={200}
-                  height={150}
-                />
-           
-              Select Position to continue</div>
+              <Image
+                src={"/assets/eth.webp"}
+                alt=""
+                className="opacity-60 transition animate-bounce-slow mix-blend-hard-light"
+                width={200}
+                height={150}
+              />
+
+              {address
+                ? "   Select Position to continue"
+                : "First Connect Wallet and make some positions on uniswap"}
+            </div>
           )}
         </div>
       ) : (
-        <div className="w-full h-screen justify-center items-center flex">Loading</div>
+        <div className="w-full h-screen justify-center items-center flex">
+          Loading
+        </div>
       )}
     </div>
   );
