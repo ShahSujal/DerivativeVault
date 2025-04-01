@@ -151,7 +151,7 @@ const MintTokenForm: React.FC<OptionsMinterProps> = ({ positions }) => {
       (p) => p.positionId.toString() === formData.positionId
     );
     setSelectedPosition(selectedPosition);
-  }, [formData.positionId]);
+  }, [formData.positionId, positions]);
 
   return (
     <Card className="w-full z-30 max-w-[550px] bg-[#11111660] border-[#2a2a36] backdrop-blur-lg rounded-3xl ">

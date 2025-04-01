@@ -83,14 +83,11 @@ export const getPoolAddress = async({
   })=>{
     
     const poolAddress = await readContract(config, {
-        address: "0x0227628f3F023bb0B980b67D528571c95c6DaC1c",
+        address: env.NEXT_PUBLIC_SEPOLIA_UNISWAP,
         abi: UNISWAP_V3_FACTORY_ABI,
         functionName: "getPool",
         args: [tokenA, tokenB, feeTier],
       });
-  
-      console.log(poolAddress);
-      
       return poolAddress
 }
 
@@ -105,41 +102,37 @@ export const getSevenDaysPoolPrice = async ({
 }) => {
   try {
     const provider = new ethers.JsonRpcProvider(env.NEXT_PUBLIC_SEPOLIA_RPC);
-
-
     const poolAddress = await getPoolAddress({
         feeTier: feeTier,
         tokenA: tokenA,
         tokenB: tokenB
     })
 
-    return poolAddress
-    // const contract = new ethers.Contract(
-    //   poolAddress,
-    //   UNISWAP_SWAP_TRANSACTION_ABI,
-    //   provider
-    // );
+    const contract = new ethers.Contract(
+      poolAddress,
+      UNISWAP_SWAP_TRANSACTION_ABI,
+      provider
+    );
 
-    // const latestBlock = await provider.getBlockNumber();
-    // const sevenDaysAgoBlock = latestBlock - 42000; // Approximate blocks in 7 days
+    const latestBlock = await provider.getBlockNumber();
+    const sevenDaysAgoBlock = latestBlock - 42000; // Approximate blocks in 7 days
 
-    // const events = await contract.queryFilter(
-    //   "Swap",
-    //   sevenDaysAgoBlock,
-    //   latestBlock
-    // );
+    const events = await contract.queryFilter(
+      "Swap",
+      sevenDaysAgoBlock,
+      latestBlock
+    );
 
-    // // Process event data
-    // const priceHistory = events.map((event) => {
-    //   const timestamp = event.blockNumber;
+    // Process event data
+    const priceHistory = events.map((event) => {
+      const timestamp = event.blockNumber;
 
-    //   console.log(events);
 
-    //   //   const price = sqrtPriceX96ToPrice(event.topics);
-    //   //   return { timestamp, price: price.toFixed(6) };
-    // });
+      //   const price = sqrtPriceX96ToPrice(event.topics);
+      //   return { timestamp, price: price.toFixed(6) };
+    });
 
-    // return priceHistory.reverse(); // Return from oldest to newest
+    return priceHistory.reverse(); // Return from oldest to newest
   } catch (error) {
     console.error("Error fetching Uniswap price history:", error);
     return [];

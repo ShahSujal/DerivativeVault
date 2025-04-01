@@ -1,9 +1,9 @@
 "use client";
 import PositionPage from "@/components/pages/positions-page";
 // import React from 'react'
-import React, { useEffect, useState } from "react";
+import React from "react";
 
-const positionList = () => {
+const PositionList = () => {
 
 
   return (
@@ -12,4 +12,4 @@ const positionList = () => {
   );
 };
 
-export default positionList;
+export default PositionList;

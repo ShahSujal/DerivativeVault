@@ -36,6 +36,9 @@ export const env = createEnv({
         NEXT_PUBLIC_UNISWAPV3_FACTORY_CONTRACT_ADDRESS: z.string().refine((v) => isAddress(v), {
           message: "Invalid address,NEXT_PUBLIC_UNISWAPV3_FACTORY_CONTRACT_ADDRESS",
         }),
+        NEXT_PUBLIC_SEPOLIA_UNISWAP: z.string().refine((v) => isAddress(v), {
+          message: "Invalid address,NEXT_PUBLIC_SEPOLIA_UNISWAP",
+        }),
        
     },
 
@@ -48,6 +51,7 @@ export const env = createEnv({
       NEXT_PUBLIC_SEPOLIA_RPC: process.env.NEXT_PUBLIC_SEPOLIA_RPC,
       NEXT_PUBLIC_UNISWAPV3_FACTORY_CONTRACT_ADDRESS: process.env.NEXT_PUBLIC_UNISWAPV3_FACTORY_CONTRACT_ADDRESS,
       GRAPH_API_KEY: process.env.GRAPH_API_KEY,
-      GRAPH_URL: process.env.GRAPH_URL
+      GRAPH_URL: process.env.GRAPH_URL,
+      NEXT_PUBLIC_SEPOLIA_UNISWAP:process.env.NEXT_PUBLIC_SEPOLIA_UNISWAP
   },
 });

@@ -21,16 +21,16 @@ export const realTimePrice = async(poolAddress:string)=>{
          headers: headersList
        });
 
-    //    console.log(response.json());
-       
+   
        
        let data:TRealTimePriceData = await response.json();
 
-       console.log(data);
-       
+   
     //    return []
        if (data.data) {
-        console.log(data);
+        
         return data
+       }else{
+        return
        }
 }

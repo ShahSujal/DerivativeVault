@@ -69,7 +69,6 @@ export const getUserPositions = async (address: Address) => {
 
     const totalPositions = Number(TotalPositions);
 
-    console.log(totalPositions);
 
     if (totalPositions > 0) {
       const positions = await Promise.all(

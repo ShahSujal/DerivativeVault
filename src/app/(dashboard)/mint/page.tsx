@@ -7,7 +7,7 @@ import useGetUserPositions from '@/lib/hooks/useGetUserPositions';
 import { useAccount } from 'wagmi';
 type Props = {}
 
-const page = (props: Props) => {
+const Page = (props: Props) => {
 
   const {address} = useAccount()
   const {data:userPositions} = useGetUserPositions(address)
@@ -45,4 +45,4 @@ const page = (props: Props) => {
   )
 }
 
-export default page
+export default Page

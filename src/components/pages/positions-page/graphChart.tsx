@@ -21,7 +21,6 @@ const PriceChart = ({ position }: { position: TPosition }) => {
       });
       const priceData = await realTimePrice(poolAddress);
 
-      console.log(priceData);
 
       if (priceData) {
         setRealTimePrice(priceData);
@@ -35,7 +34,7 @@ const PriceChart = ({ position }: { position: TPosition }) => {
     fetchPriceData();
     const interval = setInterval(fetchPriceData, 100000);
     return () => clearInterval(interval);
-  }, [position]);
+  }, [position, fetchPriceData]);
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#8080803c] backdrop-blur-lg to-[#00000008] text-white p-6">

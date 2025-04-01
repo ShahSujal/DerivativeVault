@@ -1,10 +1,10 @@
 import { TPosition } from '@/types/type'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { GlowingEffect } from './glowing-effect'
 import { cn } from '@/lib/utils'
-import { useAccount, useBalance } from 'wagmi'
+import { useAccount } from 'wagmi'
 import { config } from '@/lib/providers/wagmi.config'
-import { Address, formatUnits, parseUnits } from 'viem'
+import { Address } from 'viem'
 import { getBalance } from '@wagmi/core'
 import { walletAddressShortn } from '@/lib/actions'
 import { CopyIcon } from 'lucide-react'
@@ -18,27 +18,33 @@ const PositionCard = ({position}: Props) => {
     const [token1Symbol, setToken1Symbol] = useState('')
     const [token2Symbol, setToken2Symbol] = useState('')
 
-    const getTokenDetails = async (tokenAddress: Address) => {
-        const {symbol} = await getBalance(config,{
-            address: address as Address,
-            chainId: 11155111,
-            token: tokenAddress as Address,
-        })
-        return symbol
-    }
 
-    useEffect(() => {
-        const fetchTokens = async () => {
-            const t1 = await getTokenDetails(position.token0)
-            const t2 = await getTokenDetails(position.token1)
-            console.log(t1,t2)
-            setToken1Symbol(t1)
-            setToken2Symbol(t2)
-        }
-        fetchTokens()
-        
-    }, [position])
-    
+  // Memoize the getTokenDetails function
+  const getTokenDetails = useCallback(
+    async (tokenAddress: Address) => {
+      const { symbol } = await getBalance(config, {
+        address: address as Address,
+        chainId: 11155111,
+        token: tokenAddress as Address,
+      });
+      return symbol;
+    },
+    [address]
+  );
+
+  useEffect(() => {
+    const fetchTokens = async () => {
+      try {
+        const t1 = await getTokenDetails(position.token0);
+        const t2 = await getTokenDetails(position.token1);
+        setToken1Symbol(t1);
+        setToken2Symbol(t2);
+      } catch (error) {
+        console.error("Error fetching token details:", error);
+      }
+    };
+    fetchTokens();
+  }, [position, getTokenDetails]); // Dependencies for useEffect
 
 
   return (
