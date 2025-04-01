@@ -78,12 +78,11 @@ const MintTokenForm: React.FC<OptionsMinterProps> = ({ positions }) => {
   };
 
   const handleSubmit = async () => {
-
     setCurrentStep({
       status: EReciptStatus.LOADING,
       description: "Please wait for a while..",
       title: "Processing Transaction",
-    })
+    });
 
     const pos = positions.find(
       (item) => item.positionId == Number(formData.positionId)
@@ -312,63 +311,61 @@ const MintTokenForm: React.FC<OptionsMinterProps> = ({ positions }) => {
 
         {/* Send Button */}
         <div className="relative w-full mb-4 group">
+          <Dialog>
+            <DialogTrigger asChild>
+              <button
+                className="relative w-full inline-flex h-14 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50 mt-5"
+                onClick={() => handleSubmit()}
+              >
+                <span className="absolute inset-[-1000%] animate-[spin_8s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#0000000d_50%,#ffffff_100%)]" />
+                <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-[#1a1a23] px-3 py-1 text-sm font-medium text-white backdrop-blur-3xl">
+                  Mint Option
+                </span>
+              </button>
+            </DialogTrigger>
+            <DialogContent
+              className={`sm:max-w-[425px] ${
+                currentStep.status == EReciptStatus.LOADING
+                  ? "[&>button]:hidden"
+                  : ""
+              }`}
+              onInteractOutside={(e) => {
+                e.preventDefault();
+              }}
+            >
+              <DialogHeader>
+                <div className=" w-full h-[450px] flex justify-center flex-col items-center">
+                  <DialogTitle></DialogTitle>
 
-        <Dialog>
-          <DialogTrigger asChild>
-          <button
-            className="relative w-full inline-flex h-14 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50 mt-5"
-            onClick={() => handleSubmit()}
-          >
-            <span className="absolute inset-[-1000%] animate-[spin_8s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#0000000d_50%,#ffffff_100%)]" />
-            <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-[#1a1a23] px-3 py-1 text-sm font-medium text-white backdrop-blur-3xl">
-              Mint Option
-            </span>
-          </button>
-          </DialogTrigger>
-          <DialogContent
-            className={`sm:max-w-[425px] ${
-              currentStep.status == EReciptStatus.LOADING
-                ? "[&>button]:hidden"
-                : ""
-            }`}
-            onInteractOutside={(e) => {
-              e.preventDefault();
-            }}
-          >
-            <DialogHeader>
-              <div className=" w-full h-[450px] flex justify-center flex-col items-center">
-                <DialogTitle></DialogTitle>
-
-                <div className=" h-[150px] w-[150px]  mb-10 flex justify-center items-center">
-                  {currentStep.status == EReciptStatus.LOADING ? (
-                    <HashLoader color="#000" size={150} />
-                  ) : currentStep.status == EReciptStatus.REVERTED ? (
-                    <Image
-                      src={"/icons/error.webp"}
-                      width={400}
-                      height={400}
-                      alt=""
-                      className=" w-[150px] h-[150px] object-contain"
-                    />
-                  ) : (
-                    <Image
-                      src={"/icons/successfully.webp"}
-                      width={400}
-                      height={400}
-                      alt=""
-                      className=" w-[150px] h-[150px] object-contain"
-                    />
-                  )}
+                  <div className=" h-[150px] w-[150px]  mb-10 flex justify-center items-center">
+                    {currentStep.status == EReciptStatus.LOADING ? (
+                      <HashLoader color="#000" size={150} />
+                    ) : currentStep.status == EReciptStatus.REVERTED ? (
+                      <Image
+                        src={"/icons/error.webp"}
+                        width={400}
+                        height={400}
+                        alt=""
+                        className=" w-[150px] h-[150px] object-contain"
+                      />
+                    ) : (
+                      <Image
+                        src={"/icons/successfully.webp"}
+                        width={400}
+                        height={400}
+                        alt=""
+                        className=" w-[150px] h-[150px] object-contain"
+                      />
+                    )}
+                  </div>
+                  <h1 className=" text-center text-xl ">{currentStep.title}</h1>
+                  <DialogDescription className="text-center">
+                    {currentStep.description}
+                  </DialogDescription>
                 </div>
-                <h1 className=" text-center text-xl ">{currentStep.title}</h1>
-                <DialogDescription className="text-center">
-                  {currentStep.description}
-                </DialogDescription>
-              </div>
-            </DialogHeader>
-          </DialogContent>
-        </Dialog>
-       
+              </DialogHeader>
+            </DialogContent>
+          </Dialog>
         </div>
       </CardContent>
     </Card>

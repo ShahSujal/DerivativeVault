@@ -13,8 +13,7 @@ interface PoolCardProps {
 }
 
 export function PoolCard({ pool, token1 , token2 }: PoolCardProps) {
-  const token0Price = Number.parseFloat(pool.token0Price)
-  const token1Price = Number.parseFloat(pool.token1Price)
+
   const totalValueLockedUSD = Number.parseFloat(pool.totalValueLockedUSDUntracked)
 
   // Determine if price is up or down (in a real app, you'd compare with previous data)
