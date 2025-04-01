@@ -112,6 +112,7 @@ const MintTokenForm: React.FC<OptionsMinterProps> = ({ positions }) => {
       formData.strike,
       assetIndex == 0 ? pos.token0Decimal : pos.token1Decimal
     );
+    const positionId = pos.positionId
     const expiryTime = Number(formData);
     const isBuyOption = formData.optionType == "CALL" ? true : false;
     const issueAmount = 1;
@@ -128,6 +129,7 @@ const MintTokenForm: React.FC<OptionsMinterProps> = ({ positions }) => {
       isBuyOption,
       issueAmount,
       poolAddress,
+      positionId
     });
 
     if (response.status == EReciptStatus.SUCCESS) {
@@ -350,7 +352,7 @@ const MintTokenForm: React.FC<OptionsMinterProps> = ({ positions }) => {
             >
               <DialogHeader>
                 <div className=" w-full h-[450px] flex justify-center flex-col items-center">
-                  <DialogTitle></DialogTitle>
+                  <DialogTitle>{currentStep.title}</DialogTitle>
 
                   <div className=" h-[150px] w-[150px]  mb-10 flex justify-center items-center">
                     {currentStep.status == EReciptStatus.LOADING ? (
