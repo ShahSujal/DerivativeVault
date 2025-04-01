@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { JSX, useState } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { LayoutGrid, Package, PuzzleIcon, BarChart3, ChevronRight } from "lucide-react";
@@ -9,21 +9,17 @@ import Image from "next/image";
 
 // Integration card component
 interface IntegrationCardProps {
-  logo: React.ReactNode;
-  name: string;
+  task:{
+    name: string;
   description: string;
-  initialEnabled?: boolean;
-  gradient?: boolean;
+  page: string;
+  action: string;
+  logo: JSX.Element;
+  externalLink?: string;
+  }
 }
 
-const IntegrationCard: React.FC<IntegrationCardProps> = ({
-  logo,
-  name,
-  description,
-  initialEnabled = false,
-  gradient = false,
-}) => {
-  const [enabled, setEnabled] = useState(initialEnabled);
+const IntegrationCard= ({task}:IntegrationCardProps) => {
 
   return (
     <div
@@ -41,16 +37,16 @@ const IntegrationCard: React.FC<IntegrationCardProps> = ({
         inactiveZone={0.01}
       />
       <div className="mb-4 flex items-start justify-between">
-        <div className="h-10 w-10 overflow-hidden rounded-md">{logo}</div>
+        <div className="h-10 w-10 overflow-hidden rounded-md">{task.logo}</div>
         {/* chevron-right */}
       <div className=" w-24 h-7 rounded-full justify-center items-center flex  bg-blue-950/50 border border-gray-50/20">
-     12 Positions
+        {task.action}
       </div>
       </div>
       <h3 className="mb-2 text-xl font-medium  cursor-pointer text-gray-200">
-        {name}
+        {task.name}
       </h3>
-      <p className="text-sm text-gray-400">{description}</p>
+      <p className="text-sm text-gray-400">{task.description}</p>
     </div>
   );
 };

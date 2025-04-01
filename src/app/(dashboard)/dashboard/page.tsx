@@ -16,49 +16,13 @@ import IntegrationCard from "@/components/pages/common/intreactive-cards";
 import useGetUserPositions from "@/lib/hooks/useGetUserPositions";
 import { useAccount } from "wagmi";
 import PositionCard from "@/components/pages/common/position-card";
+import { integrationTasks } from "@/lib/constants/integrateTask";
 
 export default function Dashboard() {
   const greeting = getGreetingBasedOnTime();
   const { address } = useAccount();
   const { data: userPositions } = useGetUserPositions(address);
-  const integrationTasks = [
-    {
-      name: "TotalLockedPositions",
-      description: "Total Locked Positions on Uniswap V3 ",
-      logo: (
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white">
-          <LockIcon className=" text-gray-600" />
-        </div>
-      ),
-    },
-    {
-      name: "TotalMintedOptions",
-      description: "Total Minted Options on Uniswap V3 ",
-      logo: (
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white">
-          <Hammer className=" text-gray-600" />
-        </div>
-      ),
-    },
-    {
-      name: "TotalExercisedOptions",
-      description: "Total Exercised Options on Uniswap V3 ",
-      logo: (
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white">
-          <DraftingCompass className=" text-gray-600" />
-        </div>
-      ),
-    },
-    {
-      name: "TotalValueLocked",
-      description: "Total Value Locked on Uniswap V3 ",
-      logo: (
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white">
-          <ChartNoAxesColumn className=" text-gray-600" />
-        </div>
-      ),
-    },
-  ];
+
 
   return (
     <div className="flex h-screen bg-[#06080d] text-white">
@@ -75,9 +39,7 @@ export default function Dashboard() {
           {integrationTasks.map((task, index) => (
             <IntegrationCard
               key={index}
-              logo={task.logo}
-              name={task.name}
-              description={task.description}
+              task={task}
             />
           ))}
         </div>
