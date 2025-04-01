@@ -12,9 +12,9 @@ export default function Home() {
       }}
     >
       <div className=" backdrop-blur-sm justify-center  items-center flex flex-col rounded-lg">
-        <h1 className=" text-[9vw] text-white font-bold">Digital Vault</h1>
+        <h1 className=" text-[7vw] text-white font-bold">Derivative Vault</h1>
         <h4
-          className=" text-2xl font-bold text-blue-500 backdrop-blur-3xl p-4"
+          className=" text-2xl font-bold text-blue-700 backdrop-blur-3xl p-4"
           style={{
             textShadow: "15px 15px 20px rgba(0,0,0,0) ",
           }}

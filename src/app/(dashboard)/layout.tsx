@@ -11,9 +11,7 @@ export default function RootLayout({
   return (
     <div className=" flex h-screen flex-row bg-gradient-to-br from-[#090809] to-[#0a0a0a] justify-between">
     <Sidebar/>
-    <div className=" w-[calc(100%-256px)] h-screen">
-   
-    
+    <div className=" w-full md:w-[calc(100%-256px)] h-screen">
     <ScrollArea className="w-full h-screen">
        {children}
        </ScrollArea>

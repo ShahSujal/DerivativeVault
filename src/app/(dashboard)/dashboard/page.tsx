@@ -57,10 +57,13 @@ export default function Dashboard() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2">
-          {userPositions &&
+          {userPositions ?
             userPositions.positions.map((task, index) => (
               <PositionCard key={index} position={task} />
-            ))}
+            ))
+          :<div className=" text-center w-full h-36 text-2xl text-gray-600">
+            Create Your First Position On Uniswap
+            </div>}
         </div>
       </main>
     </div>
