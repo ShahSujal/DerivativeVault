@@ -91,7 +91,7 @@ export function SwapsDashboard({
         transition={{ duration: 0.5 }}
         className=""
       >
-        <div className="lg:col-span-2  backdrop-blur-sm rounded-2xl border border-gray-700 p-6 shadow-xl">
+        <div className="lg:col-span-2  backdrop-blur-sm rounded-2xl border border-gray-700 p-6 shadow-xl max-sm:p-0">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-semibold">Swap Activity</h2>
             <div className="flex items-center space-x-2 text-sm text-blue-400">

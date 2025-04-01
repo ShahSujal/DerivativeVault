@@ -25,7 +25,6 @@ export default function Dashboard() {
   const { address } = useAccount();
   const { data: userPositions } = useGetUserPositions(address);
 
-
   return (
     <div className="flex h-screen bg-[#06080d] text-white">
       <main className="flex-1 overflow-auto p-6">
@@ -39,31 +38,30 @@ export default function Dashboard() {
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2">
           {integrationTasks.map((task, index) => (
-            <IntegrationCard
-              key={index}
-              task={task}
-            />
+            <IntegrationCard key={index} task={task} />
           ))}
         </div>
 
         <div className=" flex flex-row justify-between items-center">
           <h1 className="text-2xl ml-2 font-semibold my-8">Your Positions</h1>
-         <Link href={"/positionlist"}>
-         <Button className=" px-3 h-10 rounded-full hover:bg-black justify-center items-center flex  bg-blue-950/50 border border-gray-50/20">
-            View All
-            <ChevronRight className=" text-gray-600" />
-          </Button>
-         </Link>
+          <Link href={"/positionlist"}>
+            <Button className=" px-3 h-10 rounded-full hover:bg-black justify-center items-center flex  bg-blue-950/50 border border-gray-50/20">
+              View All
+              <ChevronRight className=" text-gray-600" />
+            </Button>
+          </Link>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2">
-          {userPositions ?
+        <div className="grid grid-cols-1 gap-6  lg:grid-cols-2">
+          {userPositions ? (
             userPositions.positions.map((task, index) => (
               <PositionCard key={index} position={task} />
             ))
-          :<div className=" text-center w-full h-36 text-2xl text-gray-600">
-            Create Your First Position On Uniswap
-            </div>}
+          ) : (
+            <div className=" text-center w-full h-36 text-2xl text-gray-600">
+              Create Your First Position On Uniswap
+            </div>
+          )}
         </div>
       </main>
     </div>

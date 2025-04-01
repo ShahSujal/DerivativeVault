@@ -37,7 +37,7 @@ const PriceChart = ({ position }: { position: TPosition }) => {
   }, [position, fetchPriceData]);
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[#8080803c] backdrop-blur-lg to-[#00000008] text-white p-6">
+    <main className="min-h-screen bg-gradient-to-br from-[#8080803c] backdrop-blur-lg to-[#00000008] text-white p-6 max-sm:p-0">
       {realPrice && (
         <SwapsDashboard
           realPrice={realPrice}

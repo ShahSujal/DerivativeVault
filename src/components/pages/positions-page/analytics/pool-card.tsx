@@ -26,7 +26,7 @@ export function PoolCard({ pool, token1 , token2 }: PoolCardProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       className={`
-        relative overflow-hidden rounded-2xl p-6 cursor-pointer
+        relative overflow-hidden rounded-2xl p-6 max-sm:p-0 cursor-pointer
         ${
        
              "bg-gradient-to-br from-blue-900/50 to-purple-900/50 border border-blue-500/50"

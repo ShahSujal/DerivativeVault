@@ -14,7 +14,7 @@ const PositionPage = (props: Props) => {
   const [selectedPosition, setSelectedPosition] = useState<TPosition>();
   return (
         <div
-      className="min-h-screen px-4 w-full flex flex-col"
+      className="min-h-screen px-4 max-sm:px-0 w-full flex flex-col"
       style={{
         backgroundImage: "url('/assets/siworld.webp')",
         backgroundSize: "cover",

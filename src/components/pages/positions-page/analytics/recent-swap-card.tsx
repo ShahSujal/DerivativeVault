@@ -25,7 +25,7 @@ export function RecentSwapsCard({ pool }: RecentSwapsCardProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-gray-700 p-6 shadow-xl h-full"
+      className="bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-gray-700 p-6 max-sm:p-0 shadow-xl h-full"
     >
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">Recent Swaps</h2>
