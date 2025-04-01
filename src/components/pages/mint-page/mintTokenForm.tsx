@@ -6,6 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowUpDown, ChevronDown } from "lucide-react";
 import { motion } from "framer-motion";
 
+import { HashLoader } from "react-spinners";
+
 import {
   Select,
   SelectContent,
@@ -37,6 +39,7 @@ import {
 } from "@/lib/scripts/getSevenDaysPoolPrice";
 import { getPoolPriceByTokenAddress } from "@/lib/scripts/getTokenPriceByTokenAddress";
 import { EReciptStatus } from "@/types/enum";
+import Image from "next/image";
 
 // import { GlowEffect } from "./gloweffect"
 
@@ -75,6 +78,13 @@ const MintTokenForm: React.FC<OptionsMinterProps> = ({ positions }) => {
   };
 
   const handleSubmit = async () => {
+
+    setCurrentStep({
+      status: EReciptStatus.LOADING,
+      description: "Please wait for a while..",
+      title: "Processing Transaction",
+    })
+
     const pos = positions.find(
       (item) => item.positionId == Number(formData.positionId)
     );
@@ -302,6 +312,9 @@ const MintTokenForm: React.FC<OptionsMinterProps> = ({ positions }) => {
 
         {/* Send Button */}
         <div className="relative w-full mb-4 group">
+
+        <Dialog>
+          <DialogTrigger asChild>
           <button
             className="relative w-full inline-flex h-14 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50 mt-5"
             onClick={() => handleSubmit()}
@@ -311,53 +324,55 @@ const MintTokenForm: React.FC<OptionsMinterProps> = ({ positions }) => {
               Mint Option
             </span>
           </button>
-        </div>
+          </DialogTrigger>
+          <DialogContent
+            className={`sm:max-w-[425px] ${
+              currentStep.status == EReciptStatus.LOADING
+                ? "[&>button]:hidden"
+                : ""
+            }`}
+            onInteractOutside={(e) => {
+              e.preventDefault();
+            }}
+          >
+            <DialogHeader>
+              <div className=" w-full h-[450px] flex justify-center flex-col items-center">
+                <DialogTitle></DialogTitle>
 
-        {/* Transaction Details */}
+                <div className=" h-[150px] w-[150px]  mb-10 flex justify-center items-center">
+                  {currentStep.status == EReciptStatus.LOADING ? (
+                    <HashLoader color="#000" size={150} />
+                  ) : currentStep.status == EReciptStatus.REVERTED ? (
+                    <Image
+                      src={"/icons/error.webp"}
+                      width={400}
+                      height={400}
+                      alt=""
+                      className=" w-[150px] h-[150px] object-contain"
+                    />
+                  ) : (
+                    <Image
+                      src={"/icons/successfully.webp"}
+                      width={400}
+                      height={400}
+                      alt=""
+                      className=" w-[150px] h-[150px] object-contain"
+                    />
+                  )}
+                </div>
+                <h1 className=" text-center text-xl ">{currentStep.title}</h1>
+                <DialogDescription className="text-center">
+                  {currentStep.description}
+                </DialogDescription>
+              </div>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
+       
+        </div>
       </CardContent>
     </Card>
   );
 };
 
 export default MintTokenForm;
-
-/*
-    <form onSubmit={handleSubmit} className="space-y-4 bg-slate-700">
-    
-          
-          {selectedPosition && (
-            <>
-              <div>
-               
-              
-             
-             
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Expiry Date
-                </label>
-                <input
-                  type="datetime-local"
-                  name="expiry"
-                  value={formData.expiry}
-                  onChange={handleChange}
-                  className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                  required
-                />
-              </div>
-              
-              <div className="pt-4">
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-black bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  {isLoading ? 'Processing...' : 'Mint Options'}
-                </button>
-              </div>
-            </>
-          )}
-        </form>
-
-*/
