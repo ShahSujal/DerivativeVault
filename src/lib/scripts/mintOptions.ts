@@ -9,6 +9,7 @@ import {
 } from "@wagmi/core";
 import { Address } from "viem";
 import { EReciptStatus } from "@/types/enum";
+import { lockPosition } from "./lockPosition";
 
 export async function createMintOptions({
   collateralAsset,
@@ -17,6 +18,7 @@ export async function createMintOptions({
   isBuyOption,
   issueAmount,
   poolAddress,
+  positionId
 }: {
   collateralAsset: Address;
   exercisePrice: bigint;
@@ -24,14 +26,29 @@ export async function createMintOptions({
   isBuyOption: boolean;
   issueAmount: number;
   poolAddress: Address;
+  positionId:number;
 }): Promise<{
   status: EReciptStatus;
   message: string;
   explorerHash?: string;
 }> {
   try {
-    const expiryTime =
-      Math.floor(Date.now() / 1000) + expiryTimeInHours * 60 * 60;
+    const expiryTime = Math.floor(Date.now() / 1000) + expiryTimeInHours * 60 * 60;
+
+
+    // lock user position
+
+    const lockUserPosition = await lockPosition({
+     positionId:positionId,
+     deadline:expiryTime  
+    })
+
+    if (lockUserPosition.status == EReciptStatus.REVERTED) {
+     return {
+      status: EReciptStatus.REVERTED,
+      message: "Transaction Failed Cannot lock position",
+     }
+    }
 
     const { request } = await simulateContract(config, {
       address: env.NEXT_PUBLIC_DERIVATIVEVAULT_CONTRACT_ADDRESS,

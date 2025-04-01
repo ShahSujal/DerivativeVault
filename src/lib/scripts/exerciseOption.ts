@@ -24,31 +24,31 @@ export async function exerciseOption({
   earnings?: string;
 }> {
   try {
-    const { request: approveTokenRequest } = await simulateContract(config, {
-      address: assetToken,
-      abi: erc20Abi,
-      functionName: "approve",
-      args: [
-        env.NEXT_PUBLIC_DERIVATIVEVAULT_CONTRACT_ADDRESS,
-        parseUnits(amount, 18),
-      ],
-    });
+    // const { request: approveTokenRequest } = await simulateContract(config, {
+    //   address: assetToken,
+    //   abi: erc20Abi,
+    //   functionName: "approve",
+    //   args: [
+    //     env.NEXT_PUBLIC_DERIVATIVEVAULT_CONTRACT_ADDRESS,
+    //     parseUnits(amount, 18),
+    //   ],
+    // });
 
-    // Write the contract transaction
-    const approvehash = await writeContract(config, approveTokenRequest);
+    // // Write the contract transaction
+    // const approvehash = await writeContract(config, approveTokenRequest);
 
-    // Wait for the transaction receipt
-    const approvereceipt = await waitForTransactionReceipt(config, {
-      hash: approvehash,
-      confirmations: 10,
-    });
+    // // Wait for the transaction receipt
+    // const approvereceipt = await waitForTransactionReceipt(config, {
+    //   hash: approvehash,
+    //   confirmations: 10,
+    // });
 
-    if (approvereceipt.status === EReciptStatus.REVERTED) {
-      return {
-        status: EReciptStatus.REVERTED,
-        message: "Failed To Approve Token",
-      };
-    }
+    // if (approvereceipt.status === EReciptStatus.REVERTED) {
+    //   return {
+    //     status: EReciptStatus.REVERTED,
+    //     message: "Failed To Approve Token",
+    //   };
+    // }
     // Simulate the contract call
     const { request } = await simulateContract(config, {
       address: env.NEXT_PUBLIC_DERIVATIVEVAULT_CONTRACT_ADDRESS,

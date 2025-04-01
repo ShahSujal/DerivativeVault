@@ -12,12 +12,15 @@ import { EReciptStatus } from "@/types/enum";
 import { ethers, EventLog } from "ethers";
 import { derivativeVaultContractAbi } from "../constants/abi/derivativeVaultContractAbi";
 import { Address } from "viem";
+import { uniswapV3Abi } from "../constants/abi/uniswapv3abi";
 
-export const lockPosition = async (
-  positionId: number
-): Promise<{
-  amount0?: string;
-  amount1?: string;
+export const lockPosition = async ({
+  positionId,
+  deadline,
+}: {
+  positionId: number;
+  deadline: number;
+}): Promise<{
   status: EReciptStatus;
   message: string;
 }> => {
@@ -45,10 +48,30 @@ export const lockPosition = async (
       tokensOwed1: positionData[11],
     };
 
-    const { address } = await getAccount(config);
-
     if (Number(position.liquidity) > 0) {
-      const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
+      const { request: nftrequest } = await simulateContract(config, {
+        address: env.NEXT_PUBLIC_MOCKUNISWAPV3POSITIONMANAGER_CONTRACT_ADDRESS,
+        abi: uniswapV3Abi,
+        functionName: "approve",
+        args: [
+          env.NEXT_PUBLIC_MOCKUNISWAPV3POSITIONMANAGER_CONTRACT_ADDRESS,
+          BigInt(positionId),
+        ],
+      });
+
+      const nfthash = await writeContract(config, nftrequest);
+
+      const nftreceipt = await waitForTransactionReceipt(config, {
+        hash: nfthash,
+        confirmations: 10,
+      });
+
+      if (nftreceipt.status == "reverted") {
+        return {
+          status:EReciptStatus.REVERTED,
+          message:"Cannot approve nft"
+        }
+      }
 
       const { request } = await simulateContract(config, {
         address:
@@ -56,6 +79,7 @@ export const lockPosition = async (
         abi: uniswapV3PositionManagerAbi,
         functionName: "decreaseLiquidity",
         args: [positionId, position.liquidity, 0, 0, deadline],
+        value: BigInt(0),
       });
 
       const hash = await writeContract(config, request);
@@ -73,53 +97,58 @@ export const lockPosition = async (
         };
       }
 
-      if (receipt.logs.length > 0) {
-        const eventLogs = receipt.logs as unknown as EventLog[];
+    //   if (receipt.logs.length > 0) {
+    //     const eventLogs = receipt.logs as unknown as EventLog[];
 
-        const provider = new ethers.JsonRpcProvider(
-          env.NEXT_PUBLIC_SEPOLIA_RPC
-        );
+    //     const provider = new ethers.JsonRpcProvider(
+    //       env.NEXT_PUBLIC_SEPOLIA_RPC
+    //     );
 
-        // Iterate through logs to find the "OptionExercised" event
-        for (const log of eventLogs) {
-          if (log.eventName === "OptionExercised") {
-            const rpcContract = new ethers.Contract(
-              env.NEXT_PUBLIC_DERIVATIVEVAULT_CONTRACT_ADDRESS as Address,
-              derivativeVaultContractAbi,
-              provider
-            );
+    //     // Iterate through logs to find the "OptionExercised" event
+    //     for (const log of eventLogs) {
+    //       if (log.eventName === "OptionExercised") {
+    //         const rpcContract = new ethers.Contract(
+    //           env.NEXT_PUBLIC_DERIVATIVEVAULT_CONTRACT_ADDRESS as Address,
+    //           derivativeVaultContractAbi,
+    //           provider
+    //         );
 
-            const decodedLog = rpcContract.interface.parseLog({
-              topics: log.topics,
-              data: log.data,
-            });
+    //         const decodedLog = rpcContract.interface.parseLog({
+    //           topics: log.topics,
+    //           data: log.data,
+    //         });
 
-            if (decodedLog && decodedLog.args) {
-              const amount0 = ethers.formatUnits(decodedLog.args[0], 18);
+    //         if (decodedLog && decodedLog.args) {
+    //           const amount0 = ethers.formatUnits(decodedLog.args[0], 18);
 
-              const amount1 = ethers.formatUnits(decodedLog.args[1], 18);
+    //           const amount1 = ethers.formatUnits(decodedLog.args[1], 18);
 
-              return {
-                status: EReciptStatus.SUCCESS,
-                message: "Option exercised successfully",
-                amount0: amount0,
-                amount1: amount1,
-              };
-            }
-          }
-        }
-      }
+    //           return {
+    //             status: EReciptStatus.SUCCESS,
+    //             message: "Option exercised successfully",
+    //             amount0: amount0,
+    //             amount1: amount1,
+    //           };
+    //         }
+    //       }
+    //     }
+    //   }
 
-      // If no relevant event is found
-      return {
-        status: EReciptStatus.REVERTED,
-        message: "Option exercised transaction failed",
-      };
-      // Transaction failed
-    } else {
+    //   // If no relevant event is found
+    //   return {
+    //     status: EReciptStatus.REVERTED,
+    //     message: "Option exercised transaction failed",
+    //   };
+    //   // Transaction failed
+    // } else {
       return {
         status: EReciptStatus.SUCCESS,
         message: "Transaction successful",
+      };
+    }else{
+            return {
+        status: EReciptStatus.REVERTED,
+        message: "Option Liquidity transaction failed",
       };
     }
   } catch (error) {
