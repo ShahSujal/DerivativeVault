@@ -24,6 +24,8 @@ export type TPosition = {
   feeGrowthInside1LastX128: bigint;
   tokensOwed0: bigint;
   tokensOwed1: bigint;
+  token0Decimal: number;
+  token1Decimal: number
 }
 
 // getPool("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", 3000)
@@ -67,3 +69,13 @@ export type Swap = {
   timestamp:    string;
 }
 
+export type TExerciseData= {
+  derivativeToken: `0x${string}`;
+  collateralAsset: `0x${string}`;
+  exercisePrice: bigint;
+  expiryTime: bigint;
+  isBuyOption: boolean;
+  exercised: boolean;
+  collateralAmount: bigint;
+  poolAddress: `0x${string}`;
+}

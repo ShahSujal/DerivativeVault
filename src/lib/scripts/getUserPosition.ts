@@ -7,39 +7,6 @@ import { uniswapV3PositionManagerAbi } from "../constants/abi/uniswapV3PositionM
 import { TPosition } from "@/types/type";
 import { uniswapV3Abi } from "../constants/abi/uniswapv3abi";
 
-// Helper function to fetch token IDs from TheGraph
-async function fetchTokenIdsFromGraph(
-  walletAddress: string
-): Promise<bigint[]> {
-  try {
-    // This is a placeholder for TheGraph API call
-    // In a real application, you would query the Uniswap subgraph to get positions
-    // Example query:
-    /*
-      const query = `
-        {
-          positions(where: {owner: "${userAddress.toLowerCase()}"}) {
-            id
-          }
-        }
-      `;
-      const response = await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query })
-      });
-      const data = await response.json();
-      return data.data.positions.map(position => BigInt(position.id));
-      */
-
-    // For now, we'll return a range of potential token IDs (1-100)
-    // You should replace this with actual token IDs from your application
-    return Array.from({ length: 100 }, (_, i) => BigInt(i + 1));
-  } catch (error) {
-    console.error("Error fetching token IDs from TheGraph:", error);
-    return [];
-  }
-}
 
 const getUserPositionByIndex = async (address: Address, index: number) => {
   const tokenId = await readContract(config, {
@@ -56,12 +23,12 @@ const getUserPositionByIndex = async (address: Address, index: number) => {
     args: [tokenId],
   });
 
-    const {symbol:token0Symbol} = await getBalance(config,{
+    const {symbol:token0Symbol, decimals:token0Decimal} = await getBalance(config,{
         address: address as Address,
         chainId: 11155111,
         token: position[2] as Address,
     })
-    const {symbol:token1Symbol} = await getBalance(config,{
+    const {symbol:token1Symbol, decimals:token1Decimal} = await getBalance(config,{
         address: address as Address,
         chainId: 11155111,
         token: position[3] as Address,
@@ -84,6 +51,8 @@ const getUserPositionByIndex = async (address: Address, index: number) => {
     feeGrowthInside1LastX128: position[9],
     tokensOwed0: position[10],
     tokensOwed1: position[11],
+    token0Decimal: token0Decimal,
+    token1Decimal: token1Decimal
   };
   return positionData;
 };

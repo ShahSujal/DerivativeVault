@@ -25,7 +25,7 @@ import { useAppKit } from "@reown/appkit/react";
 export default function Sidebar() {
   const { address, chain } = useAccount();
   const pathname = usePathname();
-  const {open} = useAppKit()
+  const { open } = useAppKit();
   // Navigation items array
   const navItems = [
     {
@@ -73,23 +73,20 @@ export default function Sidebar() {
           <div className="flex items-center relative  flex-col justify-between">
             <div className=" absolute left-1/4 top-1/4 w-32 h-5 bg-gradient-to-tr from-[#5039ff] blur-lg to-[#207ff4]"></div>
 
-      
-            {
-              chain?.name && (
-                <Button
-              className="text-sm  border border-white/30    backdrop-blur-xl   transition duration-1000 hover:bg-white/70 hover:text-black  font-medium w-full bg-gradient-to-tr from-[#ffffff09] to-[#ffffff16] z-10"
-              variant={"default"}
-              onClick={()=>open({view:"Networks"})}
-            >
-            {chain?.name}
-            </Button>
-              )
-            }
+            {chain?.name && (
+              <Button
+                className="text-sm  border border-white/30    backdrop-blur-xl   transition duration-1000 hover:bg-white/70 hover:text-black  font-medium w-full bg-gradient-to-tr from-[#ffffff09] to-[#ffffff16] z-10"
+                variant={"default"}
+                onClick={() => open({ view: "Networks" })}
+              >
+                {chain?.name}
+              </Button>
+            )}
 
             <Button
               className="text-sm  border border-white/30    backdrop-blur-xl   transition duration-1000 hover:bg-white/70 hover:text-black  font-medium w-full bg-gradient-to-tr from-[#ffffff09] to-[#ffffff16] z-10 my-4"
               variant={"default"}
-              onClick={()=>open()}
+              onClick={() => open()}
             >
               {address
                 ? address?.slice(0, 5) + "..." + address?.slice(-5)

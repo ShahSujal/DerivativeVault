@@ -21,7 +21,7 @@ import { createMintOptions } from "@/lib/scripts/mintOptions";
 import { TPosition } from "@/types/type";
 import { walletAddressShortn } from "@/lib/actions";
 import { parseUnits } from "viem";
-import { getSevenDaysPoolPrice } from "@/lib/scripts/getSevenDaysPoolPrice";
+import { getPoolAddress, getSevenDaysPoolPrice } from "@/lib/scripts/getSevenDaysPoolPrice";
 import { getPoolPriceByTokenAddress } from "@/lib/scripts/getTokenPriceByTokenAddress";
 
 // import { GlowEffect } from "./gloweffect"
@@ -55,9 +55,6 @@ const MintTokenForm: React.FC<OptionsMinterProps> = ({ positions }) => {
   };
 
   const handleSubmit = async () => {
-    
-
-    // Convert expiry to timestamp if needed
     const expiryTimestamp = new Date(formData.expiry).getTime() / 1000;
     console.log({
       posIndex:Number(formData.positionId)
@@ -69,56 +66,26 @@ const MintTokenForm: React.FC<OptionsMinterProps> = ({ positions }) => {
     if (!pos) {
       return
     }
-
-    console.log({
-      pos
-    });
+    const collateralAsset = assetIndex == 0 ? pos.token0 : pos.token1; 
+    const exercisePrice = parseUnits(formData.strike, assetIndex == 0 ? pos.token0Decimal : pos.token1Decimal); 
+    const expiryTime = Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60; 
+    const isBuyOption = formData.optionType == "CALL" ? true : false; 
+    const issueAmount = 1
     
-
-    const collateralAsset = assetIndex == 0 ? pos.token0 : pos.token1; // USDC address
-    const exercisePrice = parseUnits(formData.strike, 6); // $3500 (6 decimals)
-    const expiryTime = Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60; // 7 days from now
-    const isBuyOption = formData.optionType == "CALL" ? true : false; // Call option
-    const issueAmount = parseUnits("10", 6); // 100 option tokens
-
- 
-    console.log({
+    const poolAddress = await getPoolAddress({
+      tokenA:pos.token0,
+      tokenB:pos.token1,
+      feeTier: pos.fee
+    })
+  
+    const response = await createMintOptions({
       collateralAsset,
       exercisePrice,
       expiryTimeInHours: expiryTime,
       isBuyOption,
       issueAmount,
+      poolAddress
     });
-
-    const poolPrice = await getSevenDaysPoolPrice({
-      tokenA:pos.token0,
-      tokenB:pos.token1,
-      feeTier: pos.fee
-    })
-    console.log(poolPrice);
-    
-    // const poolPrice = await getPoolPriceByTokenAddress({
-    //   tokenA:pos.token0,
-    //   tokenB:pos.token1,
-    //   feeTier: pos.fee
-    // })
-
-    // console.log(poolPrice);
-    
-    
-
-    // const response = await createMintOptions({
-    //   collateralAsset,
-    //   exercisePrice,
-    //   expiryTimeInHours: expiryTime,
-    //   isBuyOption,
-    //   issueAmount,
-    // });
-
-    // console.log(response);
-    
-
-
   };
 
   // Find selected position

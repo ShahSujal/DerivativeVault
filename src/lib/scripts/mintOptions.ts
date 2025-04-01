@@ -16,13 +16,15 @@ export async function createMintOptions(
   exercisePrice,
   expiryTimeInHours,
   isBuyOption,
-  issueAmount
+  issueAmount,
+  poolAddress
 }:{
   collateralAsset: Address,
   exercisePrice: bigint,
   expiryTimeInHours: number,
   isBuyOption: boolean,
-  issueAmount: bigint
+  issueAmount: number,
+  poolAddress:Address
 }
 ): Promise<{
   status: EReciptStatus;
@@ -32,18 +34,6 @@ export async function createMintOptions(
   try {
     const expiryTime = Math.floor(Date.now() / 1000) + expiryTimeInHours * 60 * 60;
 
-    // const usdcContract = new ethers.Contract(USDC_CONTRACT, ERC20_ABI, wallet);
-
-
-    const approveHash = await writeContract(config, {
-      address: collateralAsset,
-      abi: erc20Abi,
-      functionName: "approve",
-      args: [
-         env.NEXT_PUBLIC_DERIVATIVEVAULT_CONTRACT_ADDRESS,
-         BigInt(issueAmount)
-      ],
-    });
     const { request } = await simulateContract(config, {
       address: env.NEXT_PUBLIC_DERIVATIVEVAULT_CONTRACT_ADDRESS,
       abi: derivativeVaultContractAbi,
@@ -53,7 +43,8 @@ export async function createMintOptions(
         exercisePrice, // Adjust decimals based on asset
         BigInt(expiryTime),
         isBuyOption,
-        issueAmount, // Adjust decimals based on asset
+        BigInt(issueAmount),
+        poolAddress
       ],
     });
 
